@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "e2e": "dotenv -e .env.e2e -- playwright test",
+    "e2e:ui": "dotenv -e .env.e2e -- playwright test --ui"
   },
   "private": true,
   "packageManager": "npm@10.8.2",
@@ -29,6 +31,8 @@
     "@angular/build": "^21.2.10",
     "@angular/cli": "^21.2.10",
     "@angular/compiler-cli": "^21.2.0",
+    "@playwright/test": "^1.60.0",
+    "dotenv-cli": "^11.0.0",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",

@@ -46,3 +46,8 @@ Thumbs.db
 # Claude Code internal files
 .claude/agent-memory/
 .agents/
+
+# E2E
+.env.e2e
+playwright-report/
+test-results/

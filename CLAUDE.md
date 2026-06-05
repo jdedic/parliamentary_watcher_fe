@@ -49,6 +49,13 @@ No external state library. Components use `signal()` for local mutable state and
 - **Global styles for `[innerHTML]` content**: styles that target injected HTML (e.g. `.summary-text h2`) go in `src/styles.scss`, not in component styles with `::ng-deep`
 - **API key**: never hardcode in source; read from `environment.apiKey` which should be empty in committed files and injected at build time
 
+### Testing
+
+- **After adding or updating any component, pipe, service, or interceptor**, use the `angular-component-test-writer` agent to write or update the co-located `*.spec.ts` file.
+- **After adding or updating any feature component**, use the `playwright-e2e-writer` agent to write or update e2e tests in `e2e/`. Import from `e2e/fixtures/index.ts` (not directly from `@playwright/test`) so tests get the authenticated `apiContext` fixture.
+- E2E tests run against the test backend (`localhost:8001`) via `npm run e2e`. See `.env.e2e.example` for required env vars.
+- Unit tests live co-located with source files (`*.spec.ts`). Run with `ng test`.
+
 ### Visual design tokens
 
 | Token | Value | Usage |

@@ -1,10 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-import { AppComponentComponent } from './app';
+import { provideRouter } from '@angular/router';
+import { provideTranslateService } from '@ngx-translate/core';
+import { AppComponent } from './app';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
+      providers: [
+        provideRouter([]),
+        provideTranslateService({ defaultLanguage: 'en' }),
+      ],
     }).compileComponents();
   });
 
@@ -14,10 +20,11 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('renders router-outlet and app-navbar in the template', () => {
     const fixture = TestBed.createComponent(AppComponent);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, plenary-ui');
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('router-outlet')).toBeTruthy();
+    expect(el.querySelector('app-navbar')).toBeTruthy();
   });
 });
