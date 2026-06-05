@@ -1,0 +1,67 @@
+{
+  "nav": {
+    "home": "Home",
+    "sessions": "Plenaire vergaderingen",
+    "about": "Over ons"
+  },
+  "home": {
+    "hero_title": "Parlementaire Vergaderingintelligentie",
+    "hero_subtitle": "Wij analyseren plenaire vergaderingen van de Tweede Kamer met behulp van AI — we extraheren automatisch samenvattingen, standpunten van sprekers en bronverwijzingen om het democratisch debat toegankelijker en transparanter te maken.",
+    "cta": "Bekijk vergaderingen",
+    "feature_summaries_title": "AI-samenvattingen",
+    "feature_summaries_body": "Neutrale samenvattingen van 300–500 woorden per plenaire vergadering, gegenereerd op basis van het volledige transcript.",
+    "feature_stances_title": "Standpunten van sprekers",
+    "feature_stances_body": "Geclassificeerde standpunten — voor, tegen of onduidelijk — per spreker per debatonderwerp, onderbouwd door bewijs uit het transcript.",
+    "feature_sources_title": "Bronverwijzingen",
+    "feature_sources_body": "Elke samenvatting en elk standpunt verwijst terug naar de originele uitspraken in het transcript, zodat lezers elke bewering kunnen verifiëren."
+  },
+  "sessions": {
+    "page_title": "Plenaire vergaderingen",
+    "search_placeholder": "Zoek op titel...",
+    "read_more": "Lees meer",
+    "no_summary": "Samenvatting nog niet beschikbaar.",
+    "no_results": "Geen vergaderingen gevonden.",
+    "items_per_page": "Vergaderingen per pagina",
+    "of": "van"
+  },
+  "detail": {
+    "back": "Terug",
+    "tab_summary": "Samenvatting",
+    "tab_stances": "Standpunten",
+    "tab_sources": "Bronnen",
+    "no_summary": "Nog geen samenvatting gegenereerd.",
+    "no_stances": "Standpunten nog niet geëxtraheerd.",
+    "no_sources": "Bronnen niet beschikbaar.",
+    "evidence": "Bewijs",
+    "utterances": "bronutteranties",
+    "chair": "Voorzitter",
+    "room": "Zaal",
+    "date": "Datum",
+    "parliamentary_year": "Parlementair jaar",
+    "meeting": "Vergadering",
+    "chunk": "Fragment",
+    "copy_id": "Klik om te kopiëren"
+  },
+  "status": {
+    "DOWNLOADED": "Gedownload",
+    "CHUNK_SUMMARISED": "Fragmenten samengevat",
+    "SUMMARISED": "Samengevat",
+    "FAILED": "Mislukt"
+  },
+  "stance": {
+    "support": "Voor",
+    "oppose": "Tegen",
+    "unclear": "Onduidelijk"
+  },
+  "about": {
+    "title": "Over dit project",
+    "p1": "Het Parlementaire Vergaderingintelligentie-platform is een civic-tech initiatief gericht op het toegankelijker maken van het werk van de Nederlandse Tweede Kamer voor burgers, onderzoekers en journalisten.",
+    "p2": "Met behulp van grote taalmodellen verwerken we automatisch transcripten van plenaire vergaderingen van de Tweede Kamer — we produceren neutrale samenvattingen, extraheren standpunten van sprekers per debatonderwerp en koppelen elk inzicht terug aan het originele transcripsegment voor volledige verifieerbaarheid.",
+    "p3": "Het platform is gebouwd op een moderne open-source stack en is ontworpen voor transparantie, nauwkeurigheid en gebruiksgemak.",
+    "stack_title": "Technologiestack"
+  },
+  "lang": {
+    "en": "EN",
+    "nl": "NL"
+  }
+}

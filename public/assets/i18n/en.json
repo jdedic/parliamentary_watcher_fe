@@ -1,0 +1,67 @@
+{
+  "nav": {
+    "home": "Home",
+    "sessions": "Plenary Sessions",
+    "about": "About"
+  },
+  "home": {
+    "hero_title": "Parliamentary Session Intelligence",
+    "hero_subtitle": "We analyse Dutch parliamentary plenary sessions using AI — automatically extracting summaries, speaker stances, and source references to make democratic debate more accessible and transparent.",
+    "cta": "Explore Sessions",
+    "feature_summaries_title": "AI Summaries",
+    "feature_summaries_body": "Neutral 300–500 word summaries of each plenary session, generated from the full session transcript.",
+    "feature_stances_title": "Speaker Stances",
+    "feature_stances_body": "Classified positions — support, oppose, or unclear — per speaker per debate topic, backed by evidence from the transcript.",
+    "feature_sources_title": "Source References",
+    "feature_sources_body": "Every summary and stance links back to the original transcript utterances so readers can verify every claim."
+  },
+  "sessions": {
+    "page_title": "Plenary Sessions",
+    "search_placeholder": "Search by title...",
+    "read_more": "Read more",
+    "no_summary": "Summary not yet available.",
+    "no_results": "No sessions found.",
+    "items_per_page": "Sessions per page",
+    "of": "of"
+  },
+  "detail": {
+    "back": "Back",
+    "tab_summary": "Summary",
+    "tab_stances": "Stances",
+    "tab_sources": "Sources",
+    "no_summary": "No summary generated yet.",
+    "no_stances": "Stances not yet extracted.",
+    "no_sources": "Sources not available.",
+    "evidence": "Evidence",
+    "utterances": "source utterance(s)",
+    "chair": "Chair",
+    "room": "Room",
+    "date": "Date",
+    "parliamentary_year": "Parliamentary year",
+    "meeting": "Meeting",
+    "chunk": "Chunk",
+    "copy_id": "Click to copy"
+  },
+  "status": {
+    "DOWNLOADED": "Downloaded",
+    "CHUNK_SUMMARISED": "Chunks summarised",
+    "SUMMARISED": "Summarised",
+    "FAILED": "Failed"
+  },
+  "stance": {
+    "support": "Support",
+    "oppose": "Oppose",
+    "unclear": "Unclear"
+  },
+  "about": {
+    "title": "About This Project",
+    "p1": "The Parliamentary Session Intelligence platform is a civic-tech initiative aimed at making the work of the Dutch parliament more accessible to citizens, researchers, and journalists.",
+    "p2": "Using large language models, we automatically process transcripts from Tweede Kamer plenary sessions — producing neutral summaries, extracting speaker stances per debate topic, and linking every insight back to the original transcript segment for full verifiability.",
+    "p3": "The platform is built on a modern open-source stack and is designed for transparency, accuracy, and ease of use.",
+    "stack_title": "Technology Stack"
+  },
+  "lang": {
+    "en": "EN",
+    "nl": "NL"
+  }
+}
