@@ -29,6 +29,7 @@
     "tab_summary": "Summary",
     "tab_stances": "Stances",
     "tab_sources": "Sources",
+    "tab_chat": "Chat",
     "no_summary": "No summary generated yet.",
     "no_stances": "Stances not yet extracted.",
     "no_sources": "Sources not available.",
@@ -41,6 +42,15 @@
     "meeting": "Meeting",
     "chunk": "Chunk",
     "copy_id": "Click to copy"
+  },
+  "chat": {
+    "gate_heading": "Access Required",
+    "gate_description": "Enter the access code to start chatting about this session.",
+    "password_label": "Access code",
+    "password_placeholder": "Enter your access code…",
+    "submit_button": "Unlock",
+    "error_wrong_password": "Incorrect access code. Please try again.",
+    "input_placeholder": "Ask a question about this session…"
   },
   "status": {
     "DOWNLOADED": "Downloaded",

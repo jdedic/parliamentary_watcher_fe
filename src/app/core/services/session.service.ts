@@ -23,4 +23,8 @@ export class SessionService {
   chat(sessionId: string, message: string, history: ChatMessage[]): Observable<ChatResponse> {
     return this.http.post<ChatResponse>(`${this.base}/sessions/${sessionId}/chat`, { message, history });
   }
+
+  verifyChat(password: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/auth/chat`, { password });
+  }
 }

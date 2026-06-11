@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -67,7 +67,8 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
                 }
               </div>
               <p class="card-excerpt">
-                {{ session.summary ? (session.summary | excerpt) : ('sessions.no_summary' | translate) }}
+                @let localSummary = currentLang() === 'en' ? (session.summary_en ?? session.summary) : session.summary;
+                {{ localSummary ? (localSummary | excerpt) : ('sessions.no_summary' | translate) }}
               </p>
               <div class="card-footer">
                 <button mat-stroked-button color="primary" [routerLink]="['/sessions', session.id]">
@@ -140,10 +141,12 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
 export class SessionListComponent implements OnInit {
   private sessionService = inject(SessionService);
   private destroyRef = inject(DestroyRef);
+  private translateService = inject(TranslateService);
 
   sessions = signal<PlenarySessionListItem[]>([]);
   total = signal(0);
   loading = signal(false);
+  currentLang = signal(this.translateService.currentLang ?? 'en');
   searchTerm = '';
   pageSize = 20;
   currentSkip = 0;
@@ -152,6 +155,10 @@ export class SessionListComponent implements OnInit {
   private searchSubject = new Subject<string>();
 
   ngOnInit() {
+    this.translateService.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(e => this.currentLang.set(e.lang));
+
     this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe(term => {

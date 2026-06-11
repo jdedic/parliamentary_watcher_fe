@@ -70,4 +70,37 @@ describe('SessionService', () => {
       judge_verdict: 'pass',
     });
   });
+
+  describe('verifyChat()', () => {
+    it('sends POST to <apiUrl>/auth/chat with body { password }', () => {
+      service.verifyChat('some-guid').subscribe();
+
+      const req = httpController.expectOne(`${environment.apiUrl}/auth/chat`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ password: 'some-guid' });
+      req.flush(null);
+    });
+
+    it('completes the observable successfully on a 200 response', () => {
+      let completed = false;
+      service.verifyChat('some-guid').subscribe({ complete: () => { completed = true; } });
+
+      const req = httpController.expectOne(`${environment.apiUrl}/auth/chat`);
+      req.flush(null, { status: 200, statusText: 'OK' });
+
+      expect(completed).toBe(true);
+    });
+
+    it('errors the observable on a 401 response', () => {
+      let errorStatus: number | undefined;
+      service.verifyChat('wrong-password').subscribe({
+        error: (err) => { errorStatus = err.status; },
+      });
+
+      const req = httpController.expectOne(`${environment.apiUrl}/auth/chat`);
+      req.flush({ detail: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+
+      expect(errorStatus).toBe(401);
+    });
+  });
 });

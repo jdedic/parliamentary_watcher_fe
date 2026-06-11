@@ -29,6 +29,7 @@
     "tab_summary": "Samenvatting",
     "tab_stances": "Standpunten",
     "tab_sources": "Bronnen",
+    "tab_chat": "Chat",
     "no_summary": "Nog geen samenvatting gegenereerd.",
     "no_stances": "Standpunten nog niet geëxtraheerd.",
     "no_sources": "Bronnen niet beschikbaar.",
@@ -41,6 +42,15 @@
     "meeting": "Vergadering",
     "chunk": "Fragment",
     "copy_id": "Klik om te kopiëren"
+  },
+  "chat": {
+    "gate_heading": "Toegang vereist",
+    "gate_description": "Voer de toegangscode in om over deze vergadering te chatten.",
+    "password_label": "Toegangscode",
+    "password_placeholder": "Voer uw toegangscode in…",
+    "submit_button": "Ontgrendelen",
+    "error_wrong_password": "Onjuiste toegangscode. Probeer het opnieuw.",
+    "input_placeholder": "Stel een vraag over deze vergadering…"
   },
   "status": {
     "DOWNLOADED": "Gedownload",

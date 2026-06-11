@@ -5,6 +5,7 @@ export interface PlenarySessionListItem {
   room: string | null;
   chair: string | null;
   summary: string | null;
+  summary_en: string | null;
   status: SessionStatus | null;
   meeting_number: number | null;
   parliamentary_year: string | null;
@@ -27,6 +28,8 @@ export interface PlenarySession {
   summary: string | null;
   stances: StancesResponse | null;
   summary_sources: SummarySource[] | null;
+  summary_en: string | null;
+  stances_en: StancesResponse | null;
   documents: SessionDocument[];
 }
 

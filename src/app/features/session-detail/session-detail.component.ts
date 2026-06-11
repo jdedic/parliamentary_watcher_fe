@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -18,6 +18,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { SessionService } from '../../core/services/session.service';
+import { ChatAuthService } from '../../core/services/chat-auth.service';
 import { PlenarySession, Stance, SummarySource } from '../../core/models/session.model';
 import { ChatMessage } from '../../core/models/chat.model';
 import { StanceChipComponent } from '../../shared/stance-chip/stance-chip.component';
@@ -70,8 +71,8 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
           <!-- Summary tab -->
           <mat-tab [label]="'detail.tab_summary' | translate">
             <div class="tab-content">
-              @if (session()!.summary) {
-                <div class="summary-text" [innerHTML]="session()!.summary | markdown"></div>
+              @if (currentSummary()) {
+                <div class="summary-text" [innerHTML]="currentSummary() | markdown"></div>
               } @else {
                 <p class="empty-placeholder">{{ 'detail.no_summary' | translate }}</p>
               }
@@ -81,9 +82,9 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
           <!-- Stances tab -->
           <mat-tab [label]="'detail.tab_stances' | translate">
             <div class="tab-content">
-              @if (stances().length > 0) {
+              @if (currentStances().length > 0) {
                 <div class="stances-grid">
-                  @for (stance of stances(); track stance.speaker + stance.activity) {
+                  @for (stance of currentStances(); track stance.speaker + stance.activity) {
                     <mat-card class="stance-card">
                       <div class="stance-header">
                         <div>
@@ -114,36 +115,79 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
               } @else {
                 <p class="empty-placeholder">{{ 'detail.no_stances' | translate }}</p>
               }
+
             </div>
           </mat-tab>
 
 
           <!-- Chat tab -->
-          <mat-tab label="Chat">
-            <div class="tab-content chat-container">
-              <div class="chat-messages">
-                @for (msg of chatHistory(); track $index) {
-                  <div [class]="'chat-bubble chat-' + msg.role">
-                    <div [innerHTML]="msg.content | markdown"></div>
+          <mat-tab [label]="'detail.tab_chat' | translate">
+            <div class="tab-content">
+
+              @if (!chatAuthService.unlocked()) {
+                <!-- Password gate -->
+                <div class="chat-gate">
+                  <mat-card class="chat-gate-card">
+                    <mat-icon class="gate-icon">lock</mat-icon>
+                    <h2>{{ 'chat.gate_heading' | translate }}</h2>
+                    <p class="gate-description">{{ 'chat.gate_description' | translate }}</p>
+
+                    <mat-form-field appearance="outline" class="gate-field">
+                      <mat-label>{{ 'chat.password_label' | translate }}</mat-label>
+                      <input matInput
+                             type="password"
+                             [ngModel]="chatPassword()"
+                             (ngModelChange)="chatPassword.set($event); chatPasswordError.set(false)"
+                             (keydown.enter)="submitChatPassword()"
+                             [placeholder]="'chat.password_placeholder' | translate"
+                             [disabled]="chatPasswordLoading()">
+                    </mat-form-field>
+
+                    @if (chatPasswordError()) {
+                      <p class="gate-error">{{ 'chat.error_wrong_password' | translate }}</p>
+                    }
+
+                    <button mat-flat-button color="primary"
+                            (click)="submitChatPassword()"
+                            [disabled]="!chatPassword().trim() || chatPasswordLoading()">
+                      @if (chatPasswordLoading()) {
+                        <mat-spinner diameter="20"></mat-spinner>
+                      } @else {
+                        {{ 'chat.submit_button' | translate }}
+                      }
+                    </button>
+                  </mat-card>
+                </div>
+
+              } @else {
+                <!-- Chat interface -->
+                <div class="chat-container">
+                  <div class="chat-messages">
+                    @for (msg of chatHistory(); track $index) {
+                      <div [class]="'chat-bubble chat-' + msg.role">
+                        <div [innerHTML]="msg.content | markdown"></div>
+                      </div>
+                    }
+                    @if (chatLoading()) {
+                      <div class="chat-bubble chat-assistant chat-loading">
+                        <mat-spinner diameter="20"></mat-spinner>
+                      </div>
+                    }
                   </div>
-                }
-                @if (chatLoading()) {
-                  <div class="chat-bubble chat-assistant chat-loading">
-                    <mat-spinner diameter="20"></mat-spinner>
+                  <div class="chat-input-row">
+                    <mat-form-field appearance="outline" class="chat-field" subscriptSizing="dynamic">
+                      <input matInput [(ngModel)]="chatInput"
+                             (keydown.enter)="sendMessage()"
+                             [placeholder]="'chat.input_placeholder' | translate"
+                             maxlength="200">
+                    </mat-form-field>
+                    <button class="chat-send-btn" (click)="sendMessage()" [disabled]="chatLoading()">
+                      <mat-icon>send</mat-icon>
+                    </button>
                   </div>
-                }
-              </div>
-              <div class="chat-input-row">
-                <mat-form-field appearance="outline" class="chat-field" subscriptSizing="dynamic">
-                  <input matInput [(ngModel)]="chatInput"
-                         (keydown.enter)="sendMessage()"
-                         placeholder="Ask a question about this session…"
-                         maxlength="2000">
-                </mat-form-field>
-                <button class="chat-send-btn" (click)="sendMessage()" [disabled]="chatLoading()">
-                  <mat-icon>send</mat-icon>
-                </button>
-              </div>
+                </div>
+              }
+
             </div>
           </mat-tab>
 
@@ -202,6 +246,14 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
     }
     .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .chat-send-btn mat-icon { font-size: 24px; width: 24px; height: 24px; line-height: 24px; }
+
+    .chat-gate { display: flex; justify-content: center; padding: 48px 16px; }
+    .chat-gate-card { max-width: 420px; width: 100%; padding: 40px 32px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+    .gate-icon { font-size: 48px; width: 48px; height: 48px; color: #1565C0; }
+    .chat-gate-card h2 { font-size: 1.25rem; font-weight: 600; color: #1a1a2e; margin: 0; }
+    .gate-description { font-size: 0.9rem; color: #546E7A; margin: 0; }
+    .gate-field { width: 100%; }
+    .gate-error { color: #c62828; font-size: 0.85rem; margin: 0; }
   `],
 })
 export class SessionDetailComponent implements OnInit {
@@ -209,17 +261,40 @@ export class SessionDetailComponent implements OnInit {
   private sessionService = inject(SessionService);
   private snackBar = inject(MatSnackBar);
   private destroyRef = inject(DestroyRef);
+  private translateService = inject(TranslateService);
+  chatAuthService = inject(ChatAuthService);
 
   session = signal<PlenarySession | null>(null);
   loading = signal(true);
-  stances = computed<Stance[]>(() => this.session()?.stances?.stances ?? []);
+  currentLang = signal(this.translateService.currentLang ?? 'nl');
   sources = computed<SummarySource[]>(() => this.session()?.summary_sources ?? []);
+
+  currentSummary = computed<string | null>(() => {
+    const s = this.session();
+    if (!s) return null;
+    return this.currentLang() === 'en' ? (s.summary_en ?? s.summary) : s.summary;
+  });
+
+  currentStances = computed<Stance[]>(() => {
+    const s = this.session();
+    if (!s) return [];
+    const src = this.currentLang() === 'en' ? (s.stances_en ?? s.stances) : s.stances;
+    return src?.stances ?? [];
+  });
 
   chatHistory = signal<ChatMessage[]>([]);
   chatInput = '';
   chatLoading = signal(false);
 
+  chatPassword = signal('');
+  chatPasswordError = signal(false);
+  chatPasswordLoading = signal(false);
+
   ngOnInit() {
+    this.translateService.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(e => this.currentLang.set(e.lang));
+
     this.route.paramMap
       .pipe(
         switchMap(params => {
@@ -235,9 +310,28 @@ export class SessionDetailComponent implements OnInit {
       });
   }
 
+  submitChatPassword(): void {
+    const pwd = this.chatPassword().trim();
+    if (!pwd || this.chatPasswordLoading()) return;
+    this.chatPasswordError.set(false);
+    this.chatPasswordLoading.set(true);
+    this.sessionService.verifyChat(pwd)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.chatAuthService.unlock();
+          this.chatPasswordLoading.set(false);
+        },
+        error: () => {
+          this.chatPasswordError.set(true);
+          this.chatPasswordLoading.set(false);
+        },
+      });
+  }
+
   sendMessage() {
     const msg = this.chatInput.trim();
-    if (!msg || msg.length > 2000 || this.chatLoading()) return;
+    if (!msg || msg.length > 200 || this.chatLoading()) return;
     const historyBeforeThisMessage = this.chatHistory();
     const userMsg: ChatMessage = { role: 'user', content: msg };
     this.chatHistory.update(h => [...h, userMsg]);

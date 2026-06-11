@@ -17,6 +17,7 @@ const mockSession: PlenarySessionListItem = {
   room: 'Room A',
   chair: 'John Doe',
   summary: 'A test summary',
+  summary_en: null,
   status: 'SUMMARISED',
   meeting_number: 1,
   parliamentary_year: '2023-2024',
