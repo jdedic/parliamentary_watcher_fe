@@ -4,6 +4,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+ARG API_KEY
+RUN sed -i "s/apiKey: ''/apiKey: '$API_KEY'/" src/environments/environment.production.ts
 RUN npm run build -- --configuration production
 
 # Stage 2: Serve
