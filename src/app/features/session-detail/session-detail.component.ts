@@ -174,6 +174,9 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
                       </div>
                     }
                   </div>
+                  @if (chatError()) {
+                    <p class="chat-error">{{ chatError() }}</p>
+                  }
                   <div class="chat-input-row">
                     <mat-form-field appearance="outline" class="chat-field" subscriptSizing="dynamic">
                       <input matInput [(ngModel)]="chatInput"
@@ -197,9 +200,16 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
   `,
   styles: [`
     .spinner-wrap { display: flex; justify-content: center; padding: 80px; }
-    .detail-container { max-width: 1000px; margin: 32px auto; padding: 0 24px; }
+    .detail-container { max-width: 1000px; margin: 0 auto; padding: 28px 24px 48px; }
 
-    .detail-header { margin-bottom: 32px; }
+    .detail-header {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      padding: 20px 24px 24px;
+      margin-bottom: 20px;
+    }
     .header-title-row { display: flex; align-items: flex-start; gap: 16px; margin: 12px 0; flex-wrap: wrap; }
     h1 { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; margin: 0; flex: 1; }
 
@@ -207,7 +217,21 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
     .meta-item { display: flex; align-items: center; gap: 4px; font-size: 0.875rem; color: #546E7A; }
     .meta-item mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
-    .tab-content { padding: 32px 0; }
+    :host ::ng-deep .mat-mdc-tab-header {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+    }
+    :host ::ng-deep .mat-mdc-tab-body-wrapper {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .tab-content { padding: 28px 24px; }
     .summary-text { font-size: 1rem; line-height: 1.8; color: #37474F; white-space: pre-wrap; }
     .empty-placeholder { color: #90A4AE; font-style: italic; }
 
@@ -246,6 +270,7 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
     }
     .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .chat-send-btn mat-icon { font-size: 24px; width: 24px; height: 24px; line-height: 24px; }
+    .chat-error { color: #c62828; font-size: 0.85rem; margin: 4px 0 8px; text-align: center; }
 
     .chat-gate { display: flex; justify-content: center; padding: 48px 16px; }
     .chat-gate-card { max-width: 420px; width: 100%; padding: 40px 32px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
@@ -285,6 +310,7 @@ export class SessionDetailComponent implements OnInit {
   chatHistory = signal<ChatMessage[]>([]);
   chatInput = '';
   chatLoading = signal(false);
+  chatError = signal<string | null>(null);
 
   chatPassword = signal('');
   chatPasswordError = signal(false);
@@ -336,6 +362,7 @@ export class SessionDetailComponent implements OnInit {
     const userMsg: ChatMessage = { role: 'user', content: msg };
     this.chatHistory.update(h => [...h, userMsg]);
     this.chatInput = '';
+    this.chatError.set(null);
     this.chatLoading.set(true);
     this.sessionService.chat(this.session()!.id, msg, historyBeforeThisMessage)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -344,7 +371,10 @@ export class SessionDetailComponent implements OnInit {
           this.chatHistory.update(h => [...h, { role: 'assistant', content: res.answer }]);
           this.chatLoading.set(false);
         },
-        error: () => this.chatLoading.set(false),
+        error: (err) => {
+          this.chatError.set(err?.error?.detail ?? 'Something went wrong. Please try again.');
+          this.chatLoading.set(false);
+        },
       });
   }
 
