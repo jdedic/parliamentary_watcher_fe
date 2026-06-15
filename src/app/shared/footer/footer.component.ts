@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-footer',
@@ -21,11 +21,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
           {{ 'nav.about' | translate }}
         </a>
       </nav>
-      <div class="lang-toggle">
-        <button [class.lang-active]="currentLang === 'en'" (click)="setLang('en')">EN</button>
-        <span class="lang-sep">|</span>
-        <button [class.lang-active]="currentLang === 'nl'" (click)="setLang('nl')">NL</button>
-      </div>
     </footer>
   `,
   styles: [`
@@ -46,26 +41,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     }
     .footer-nav a:hover { color: white; }
     .active-link { color: white; text-decoration: underline; }
-    .lang-toggle { display: flex; align-items: center; gap: 4px; }
-    .lang-toggle button {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.85);
-      cursor: pointer;
-      font-size: 0.9rem;
-      padding: 0 4px;
-    }
-    .lang-toggle button:hover { color: white; }
-    .lang-active { color: white !important; font-weight: 600; }
-    .lang-sep { color: rgba(255,255,255,0.5); }
   `],
 })
-export class FooterComponent {
-  private translate = inject(TranslateService);
-  currentLang = this.translate.currentLang || 'en';
-
-  setLang(lang: string) {
-    this.translate.use(lang);
-    this.currentLang = lang;
-  }
-}
+export class FooterComponent {}
