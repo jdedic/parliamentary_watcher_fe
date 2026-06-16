@@ -50,6 +50,7 @@
     "password_placeholder": "Enter your access code…",
     "submit_button": "Unlock",
     "error_wrong_password": "Incorrect access code. Please try again.",
+    "gate_contact": "Want to test the chat? Contact me at",
     "input_placeholder": "Ask a question about this session…"
   },
   "status": {

@@ -50,6 +50,7 @@
     "password_placeholder": "Voer uw toegangscode in…",
     "submit_button": "Ontgrendelen",
     "error_wrong_password": "Onjuiste toegangscode. Probeer het opnieuw.",
+    "gate_contact": "Wil je de chat testen? Neem contact op via",
     "input_placeholder": "Stel een vraag over deze vergadering…"
   },
   "status": {

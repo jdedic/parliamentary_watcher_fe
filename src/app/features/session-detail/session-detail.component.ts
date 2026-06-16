@@ -130,7 +130,10 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
                   <mat-card class="chat-gate-card">
                     <mat-icon class="gate-icon">lock</mat-icon>
                     <h2>{{ 'chat.gate_heading' | translate }}</h2>
-                    <p class="gate-description">{{ 'chat.gate_description' | translate }}</p>
+                    <p class="gate-contact">
+                      {{ 'chat.gate_contact' | translate }}
+                      <a href="mailto:jelena.dedic.it@gmail.com">jelena.dedic.it@gmail.com</a>
+                    </p>
 
                     <mat-form-field appearance="outline" class="gate-field">
                       <mat-label>{{ 'chat.password_label' | translate }}</mat-label>
@@ -277,6 +280,8 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
     .gate-icon { font-size: 48px; width: 48px; height: 48px; color: #1565C0; }
     .chat-gate-card h2 { font-size: 1.25rem; font-weight: 600; color: #1a1a2e; margin: 0; }
     .gate-description { font-size: 0.9rem; color: #546E7A; margin: 0; }
+    .gate-contact { font-size: 0.85rem; color: #546E7A; margin: 0; }
+    .gate-contact a { color: #1565C0; }
     .gate-field { width: 100%; }
     .gate-error { color: #c62828; font-size: 0.85rem; margin: 0; }
   `],
@@ -291,7 +296,7 @@ export class SessionDetailComponent implements OnInit {
 
   session = signal<PlenarySession | null>(null);
   loading = signal(true);
-  currentLang = signal(this.translateService.currentLang ?? 'nl');
+  currentLang = signal('en');
   sources = computed<SummarySource[]>(() => this.session()?.summary_sources ?? []);
 
   currentSummary = computed<string | null>(() => {
