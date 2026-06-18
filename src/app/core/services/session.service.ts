@@ -1,13 +1,15 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PlenarySession, SessionListResponse } from '../models/session.model';
 import { ChatMessage, ChatResponse } from '../models/chat.model';
+import { ChatAuthService } from './chat-auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class SessionService {
   private http = inject(HttpClient);
+  private chatAuth = inject(ChatAuthService);
   private base = environment.apiUrl;
 
   getSessions(skip = 0, limit = 20, title?: string): Observable<SessionListResponse> {
@@ -21,7 +23,9 @@ export class SessionService {
   }
 
   chat(sessionId: string, message: string, history: ChatMessage[]): Observable<ChatResponse> {
-    return this.http.post<ChatResponse>(`${this.base}/sessions/${sessionId}/chat`, { message, history });
+    const key = this.chatAuth.key();
+    const headers = key ? new HttpHeaders({ 'X-Chat-Key': key }) : undefined;
+    return this.http.post<ChatResponse>(`${this.base}/sessions/${sessionId}/chat`, { message, history }, { headers });
   }
 
   verifyChat(password: string): Observable<void> {

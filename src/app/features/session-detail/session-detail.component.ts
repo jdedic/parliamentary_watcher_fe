@@ -350,7 +350,7 @@ export class SessionDetailComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.chatAuthService.unlock();
+          this.chatAuthService.unlock(pwd);
           this.chatPasswordLoading.set(false);
         },
         error: () => {
