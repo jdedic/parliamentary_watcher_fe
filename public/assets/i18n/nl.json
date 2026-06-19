@@ -13,7 +13,9 @@
     "feature_stances_title": "Standpunten van sprekers",
     "feature_stances_body": "Geclassificeerde standpunten — voor, tegen of onduidelijk — per spreker per debatonderwerp, onderbouwd door bewijs uit het transcript.",
     "feature_sources_title": "Bronverwijzingen",
-    "feature_sources_body": "Elke samenvatting en elk standpunt verwijst terug naar de originele uitspraken in het transcript, zodat lezers elke bewering kunnen verifiëren."
+    "feature_sources_body": "Elke samenvatting en elk standpunt verwijst terug naar de originele uitspraken in het transcript, zodat lezers elke bewering kunnen verifiëren.",
+    "feature_chat_title": "Vergaderingchat",
+    "feature_chat_body": "Stel vragen over een plenaire vergadering en ontvang AI-antwoorden direct gebaseerd op het transcript."
   },
   "sessions": {
     "page_title": "Plenaire vergaderingen",

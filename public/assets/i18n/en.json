@@ -13,7 +13,9 @@
     "feature_stances_title": "Speaker Stances",
     "feature_stances_body": "Classified positions — support, oppose, or unclear — per speaker per debate topic, backed by evidence from the transcript.",
     "feature_sources_title": "Source References",
-    "feature_sources_body": "Every summary and stance links back to the original transcript utterances so readers can verify every claim."
+    "feature_sources_body": "Every summary and stance links back to the original transcript utterances so readers can verify every claim.",
+    "feature_chat_title": "Session Chat",
+    "feature_chat_body": "Ask questions about any plenary session and get AI-powered answers grounded directly in the session transcript."
   },
   "sessions": {
     "page_title": "Plenary Sessions",

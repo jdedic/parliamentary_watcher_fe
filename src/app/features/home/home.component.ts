@@ -37,6 +37,11 @@ import { MatCardModule } from '@angular/material/card';
         <h3>{{ 'home.feature_sources_title' | translate }}</h3>
         <p>{{ 'home.feature_sources_body' | translate }}</p>
       </mat-card>
+      <mat-card class="feature-card">
+        <mat-icon class="feature-icon">chat</mat-icon>
+        <h3>{{ 'home.feature_chat_title' | translate }}</h3>
+        <p>{{ 'home.feature_chat_body' | translate }}</p>
+      </mat-card>
     </section>
   `,
   styles: [`
@@ -72,22 +77,22 @@ import { MatCardModule } from '@angular/material/card';
     }
     .features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
       max-width: 1100px;
       margin: 48px auto;
       padding: 0 24px;
     }
     .feature-card {
-      padding: 32px 24px;
+      padding: 24px 16px;
       text-align: center;
     }
     .feature-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
       color: #1565C0;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     .feature-card h3 {
       font-size: 1.15rem;
