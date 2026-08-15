@@ -16,11 +16,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTableModule } from '@angular/material/table';
 
 import { SessionService } from '../../core/services/session.service';
 import { ChatAuthService } from '../../core/services/chat-auth.service';
 import { PlenarySession, Stance, SummarySource } from '../../core/models/session.model';
-import { ChatMessage } from '../../core/models/chat.model';
+import { ChatMessage, ChunkDetail } from '../../core/models/chat.model';
 import { StanceChipComponent } from '../../shared/stance-chip/stance-chip.component';
 import { MarkdownPipe } from '../../shared/markdown.pipe';
 
@@ -33,6 +34,7 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
     MatTabsModule, MatButtonModule, MatIconModule, MatCardModule,
     MatExpansionModule, MatProgressSpinnerModule, MatChipsModule,
     MatTooltipModule, MatSnackBarModule, MatInputModule, MatFormFieldModule,
+    MatTableModule,
     StanceChipComponent, MarkdownPipe,
   ],
   template: `
@@ -197,6 +199,54 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
             </div>
           </mat-tab>
 
+          <!-- Retrieval tab (debug-only, enable via window.enableRetrievalTab() in console) -->
+          @if (debugMode()) {
+            <mat-tab label="Retrieval">
+              <div class="tab-content">
+                @if (lastChunks().length === 0) {
+                  <p class="empty-placeholder">Ask a question in the Chat tab to see retrieval details.</p>
+                } @else {
+                  <table mat-table [dataSource]="lastChunks()" class="retrieval-table">
+                    <ng-container matColumnDef="rank">
+                      <th mat-header-cell *matHeaderCellDef>#</th>
+                      <td mat-cell *matCellDef="let c; let i = index">{{ i + 1 }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="chunk_id">
+                      <th mat-header-cell *matHeaderCellDef>Chunk ID</th>
+                      <td mat-cell *matCellDef="let c" class="mono">{{ c.chunk_id.slice(0, 8) }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="rrf_score">
+                      <th mat-header-cell *matHeaderCellDef>RRF score</th>
+                      <td mat-cell *matCellDef="let c">{{ c.rrf_score }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="rerank_score">
+                      <th mat-header-cell *matHeaderCellDef>Rerank score</th>
+                      <td mat-cell *matCellDef="let c">{{ c.rerank_score ?? '—' }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="chunk_index">
+                      <th mat-header-cell *matHeaderCellDef>Index</th>
+                      <td mat-cell *matCellDef="let c">{{ c.chunk_index ?? '—' }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="type">
+                      <th mat-header-cell *matHeaderCellDef>Type</th>
+                      <td mat-cell *matCellDef="let c">
+                        <span [class]="c.is_neighbor ? 'badge-neighbor' : 'badge-retrieved'">
+                          {{ c.is_neighbor ? 'neighbor' : 'retrieved' }}
+                        </span>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="speakers">
+                      <th mat-header-cell *matHeaderCellDef>Speakers</th>
+                      <td mat-cell *matCellDef="let c">{{ c.speakers.join(', ') || '—' }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="retrievalColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: retrievalColumns"></tr>
+                  </table>
+                }
+              </div>
+            </mat-tab>
+          }
+
         </mat-tab-group>
       </div>
     }
@@ -284,6 +334,13 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
     .gate-contact a { color: #1565C0; }
     .gate-field { width: 100%; }
     .gate-error { color: #c62828; font-size: 0.85rem; margin: 0; }
+
+    .retrieval-table { width: 100%; }
+    .retrieval-table th { font-weight: 600; color: #546E7A; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .retrieval-table td { font-size: 0.875rem; color: #37474F; }
+    .mono { font-family: monospace; font-size: 0.8rem; }
+    .badge-retrieved { background: #e3f2fd; color: #1565C0; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
+    .badge-neighbor  { background: #f3e5f5; color: #6a1b9a; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
   `],
 })
 export class SessionDetailComponent implements OnInit {
@@ -321,7 +378,16 @@ export class SessionDetailComponent implements OnInit {
   chatPasswordError = signal(false);
   chatPasswordLoading = signal(false);
 
+  lastChunks = signal<ChunkDetail[]>([]);
+  readonly retrievalColumns = ['rank', 'chunk_id', 'rrf_score', 'rerank_score', 'chunk_index', 'type', 'speakers'];
+  debugMode = signal(localStorage.getItem('debugRetrieval') === '1');
+
   ngOnInit() {
+    (window as any).enableRetrievalTab = (enabled: boolean = true) => {
+      localStorage.setItem('debugRetrieval', enabled ? '1' : '0');
+      this.debugMode.set(enabled);
+    };
+
     this.translateService.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(e => this.currentLang.set(e.lang));
@@ -374,6 +440,7 @@ export class SessionDetailComponent implements OnInit {
       .subscribe({
         next: res => {
           this.chatHistory.update(h => [...h, { role: 'assistant', content: res.answer }]);
+          this.lastChunks.set(res.chunks ?? []);
           this.chatLoading.set(false);
         },
         error: (err) => {
