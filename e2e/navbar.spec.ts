@@ -6,8 +6,8 @@ test.describe('Navbar', () => {
       await page.goto('/');
     });
 
-    test('renders the ParlAI brand', async ({ page }) => {
-      await expect(page.getByText('ParlAI')).toBeVisible();
+    test('renders the Demos brand', async ({ page }) => {
+      await expect(page.getByText('Demos')).toBeVisible();
     });
 
     test('renders Home nav link', async ({ page }) => {
@@ -34,7 +34,7 @@ test.describe('Navbar', () => {
         route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ total: 0, sessions: [] }) })
       );
       await page.goto('/sessions');
-      await page.getByText('ParlAI').click();
+      await page.getByText('Demos').click();
       await page.waitForURL('/');
       await expect(page).toHaveURL('/');
     });

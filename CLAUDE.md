@@ -8,8 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm install          # install dependencies
 ng serve             # dev server at http://localhost:4200 (requires backend at localhost:8000)
 ng build             # production build → dist/
-ng test              # run all tests (Vitest)
-ng test --run        # run tests once without watch mode
+ng test              # run all tests (Vitest) — exits after one run in this repo's non-interactive shell
 ```
 
 The API key must be set in `src/environments/environment.ts` before running. The backend (`../plenary-session/`) must be running at `http://localhost:8000`.
@@ -27,7 +26,7 @@ Template → signal() reads
          → FastAPI backend /api/v1
 ```
 
-`SessionService` is the single HTTP boundary. All three methods return `Observable`; components consume them with `.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(...)` — never `async` pipe, never bare subscribe.
+`SessionService` is the HTTP boundary for session/chat data; `SpeakerService` is a second, narrower boundary for the speaker entity. Both follow the same shape (`providedIn: 'root'`, one typed method per endpoint) and their methods return `Observable`; components consume them with `.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(...)` — never `async` pipe, never bare subscribe.
 
 ### State management
 
@@ -35,7 +34,7 @@ No external state library. Components use `signal()` for local mutable state and
 
 ### i18n
 
-`@ngx-translate/core` with JSON files in `src/assets/i18n/en.json` and `nl.json`. Language is set at bootstrap in `AppComponent`. The `NavbarComponent` exposes EN/NL toggle buttons that call `TranslateService.use()`.
+`@ngx-translate/core` with JSON files in `public/assets/i18n/en.json` and `nl.json`. Language is set at bootstrap in `AppComponent`. The `NavbarComponent` exposes EN/NL toggle buttons that call `TranslateService.use()`.
 
 ### Markdown rendering
 
@@ -56,12 +55,37 @@ No external state library. Components use `signal()` for local mutable state and
 - E2E tests run against the test backend (`localhost:8001`) via `npm run e2e`. See `.env.e2e.example` for required env vars.
 - Unit tests live co-located with source files (`*.spec.ts`). Run with `ng test`.
 
-### Visual design tokens
+### Visual design system — "Open Record" (brand: Demos)
+
+All tokens are CSS custom properties defined once in `src/styles.scss` `:root`. Components
+reference `var(--token)` — never re-hardcode a hex value.
 
 | Token | Value | Usage |
 |---|---|---|
-| Primary | `#1565C0` | Navbar, buttons, headings |
-| Accent | `#546E7A` | Labels, secondary text |
-| Background | `#F5F7FA` | Page background |
+| `--paper` | `#faf7f2` | Page background |
+| `--surface` | `#ffffff` | Cards, raised elements |
+| `--ink` | `#1c1c1e` | Primary text, headings |
+| `--text-muted` | `#8a857c` | Secondary text, metadata |
+| `--line` | `#e7e1d6` | Hairline borders/dividers |
+| `--accent` | `#e0a526` | Amber — **reserved**: source-linked evidence only, plus the one primary CTA per view |
+| `--on-accent` | `#3a2c07` | Text on amber fills |
+| `--anchor` | `#3c4a57` | Slate — structural weight, focus rings, links/icons, and Material's `primary` palette |
+| `--stance-support` | `#2f6e73` | Teal — "supported / voted for" |
+| `--stance-oppose` | `#a8622a` | Brown — "opposed / voted against" |
+| `--stance-unclear` | = `--text-muted`, italic | "position unclear" |
 
-Session status → `StatusBadgeComponent`; speaker stance (`support`/`oppose`/`unclear`) → `StanceChipComponent`.
+Fonts (three roles, two weights each, never a fourth family):
+- `--font-display` (Space Grotesk 500/700) — h1–h3, logo wordmark, party/MP names.
+- `--font-body` (Inter 400/500/600) — everything else: body copy, nav, buttons, labels, AI-generated summaries/chat answers.
+- `--font-voice` (Source Serif 4 400/500/400italic) — **verbatim parliamentary quotes only** (e.g. `session-detail`'s `.evidence-quote`). Never apply to AI-generated text (chat answers, summaries) — that would misrepresent AI output as the official record.
+
+Shape: `--radius` (10px) for cards/fields/buttons/tags; `--radius-pill` (999px) for pill-style chips only. One hairline border weight (`--line`), near-flat `--shadow-card` (`0 1px 2px rgba(28,28,30,.05)`) — no heavier shadows, gradients, or glow.
+
+Hard rules (do not drift):
+1. No dominant/saturated full-bleed color field anywhere (this is why the navbar/footer/hero have no colored background — a solid color bar reads as a party affiliation in a parliamentary-transparency product).
+2. Amber (`--accent`) marks source-linked evidence only, plus the single primary CTA per view (given its own `.btn`/`.cta`/`.gate-submit`-style class, not Material's `color="primary"`).
+3. Serif (`--font-voice`) marks verbatim transcript speech only.
+4. Stance colors never recolor to match a political party.
+5. Sentence case everywhere (the uppercase eyebrow label is the one deliberate exception).
+
+Session status → `StatusBadgeComponent`; speaker stance (`support`/`oppose`/`unclear`) → `StanceChipComponent`. Both render as bordered, flat pills (no fill, no shadow) per the rules above.

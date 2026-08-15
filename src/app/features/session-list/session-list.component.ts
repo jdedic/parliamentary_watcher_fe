@@ -92,32 +92,36 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
   `,
   styles: [`
     .list-container { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
-    h1 { font-size: 1.75rem; font-weight: 700; color: #1565C0; margin-bottom: 24px; }
+    h1 { font-size: 1.75rem; font-weight: 700; color: var(--ink); margin-bottom: 24px; }
     .search-field { width: 100%; max-width: 480px; margin-bottom: 32px; }
     .spinner-wrap { display: flex; justify-content: center; padding: 60px; }
-    .empty-msg { color: #78909C; font-size: 1rem; text-align: center; padding: 60px 0; }
+    .empty-msg { color: var(--text-muted); font-size: 1rem; text-align: center; padding: 60px 0; }
     .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 24px;
       margin-bottom: 32px;
     }
-    .session-card { padding: 24px; display: flex; flex-direction: column; gap: 10px; }
+    .session-card {
+      padding: 24px; display: flex; flex-direction: column; gap: 10px;
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+    }
     .card-meta { display: flex; align-items: center; justify-content: space-between; }
-    .meeting-label { font-size: 0.8rem; color: #78909C; font-weight: 500; }
+    .meeting-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
     .session-date {
       font-size: 0.8rem;
       font-weight: 500;
       padding: 4px 12px;
-      border-radius: 16px;
-      background: #e0e0e0;
-      color: #616161;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      border-radius: var(--radius);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--ink);
     }
     .card-title {
       font-size: 1.05rem;
-      font-weight: 600;
-      color: #1a1a2e;
+      font-weight: 500;
+      color: var(--ink);
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -129,12 +133,12 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
       flex-wrap: wrap;
       gap: 8px;
       font-size: 0.85rem;
-      color: #546E7A;
+      color: var(--text-muted);
       margin: 8px 0 0;
     }
     .detail-item { font-weight: 500; }
-    .detail-separator { color: #9e9e9e; }
-    .card-excerpt { font-size: 0.9rem; color: #546E7A; line-height: 1.6; flex: 1; margin: 0; font-style: italic; }
+    .detail-separator { color: var(--line); }
+    .card-excerpt { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; flex: 1; margin: 0; font-style: italic; }
     .card-footer { margin-top: 8px; }
   `],
 })

@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { MatChipsModule } from '@angular/material/chips';
 
 const STACK = ['Python', 'FastAPI', 'OpenAI', 'Qdrant', 'PostgreSQL', 'Angular', 'Angular Material'];
 
@@ -8,7 +7,7 @@ const STACK = ['Python', 'FastAPI', 'OpenAI', 'Qdrant', 'PostgreSQL', 'Angular',
   selector: 'app-about',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslateModule, MatChipsModule],
+  imports: [TranslateModule],
   template: `
     <div class="about-container">
       <h1>{{ 'about.title' | translate }}</h1>
@@ -17,11 +16,11 @@ const STACK = ['Python', 'FastAPI', 'OpenAI', 'Qdrant', 'PostgreSQL', 'Angular',
       <p>{{ 'about.p3' | translate }}</p>
 
       <h2>{{ 'about.stack_title' | translate }}</h2>
-      <mat-chip-set class="stack-chips">
+      <div class="stack-chips">
         @for (tech of stack; track tech) {
-          <mat-chip>{{ tech }}</mat-chip>
+          <span class="chip">{{ tech }}</span>
         }
-      </mat-chip-set>
+      </div>
     </div>
   `,
   styles: [`
@@ -32,23 +31,30 @@ const STACK = ['Python', 'FastAPI', 'OpenAI', 'Qdrant', 'PostgreSQL', 'Angular',
     }
     h1 {
       font-size: 2rem;
-      font-weight: 700;
-      color: #1565C0;
+      color: var(--ink);
       margin-bottom: 24px;
     }
     h2 {
       font-size: 1.2rem;
-      font-weight: 600;
+      font-weight: 500;
       margin: 32px 0 16px;
-      color: #1a1a2e;
+      color: var(--ink);
     }
     p {
       font-size: 1rem;
       line-height: 1.75;
-      color: #37474F;
+      color: var(--text-muted);
       margin-bottom: 16px;
     }
     .stack-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      font-size: 13px;
+      padding: 6px 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      color: var(--ink);
+      background: var(--surface);
+    }
   `],
 })
 export class AboutComponent {

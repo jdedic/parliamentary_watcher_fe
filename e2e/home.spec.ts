@@ -8,7 +8,7 @@ test.describe('Home page', () => {
   test('renders the hero section with title, subtitle, and CTA button', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1, name: 'Parliamentary Session Intelligence' })).toBeVisible();
     await expect(page.getByText('We analyse Dutch parliamentary plenary sessions using AI')).toBeVisible();
-    await expect(page.getByRole('button', { name: /Explore Sessions/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Explore Sessions/i })).toBeVisible();
   });
 
   test('CTA button navigates to /sessions', async ({ page }) => {
@@ -20,7 +20,7 @@ test.describe('Home page', () => {
       })
     );
 
-    await page.getByRole('button', { name: /Explore Sessions/i }).click();
+    await page.getByRole('link', { name: /Explore Sessions/i }).click();
     await page.waitForURL('/sessions');
     await expect(page).toHaveURL('/sessions');
   });
@@ -38,6 +38,6 @@ test.describe('Home page', () => {
   });
 
   test('navbar brand link is present', async ({ page }) => {
-    await expect(page.getByText('ParlAI')).toBeVisible();
+    await expect(page.getByText('Demos')).toBeVisible();
   });
 });

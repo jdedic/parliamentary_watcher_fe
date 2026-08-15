@@ -5,6 +5,7 @@
     "about": "Over ons"
   },
   "home": {
+    "eyebrow": "Tweede Kamer · parlementaire transparantie",
     "hero_title": "Parlementaire Vergaderingintelligentie",
     "hero_subtitle": "Wij analyseren plenaire vergaderingen van de Tweede Kamer met behulp van AI — we extraheren automatisch samenvattingen, standpunten van sprekers en bronverwijzingen om het democratisch debat toegankelijker en transparanter te maken.",
     "cta": "Bekijk vergaderingen",
@@ -54,6 +55,11 @@
     "error_wrong_password": "Onjuiste toegangscode. Probeer het opnieuw.",
     "gate_contact": "Wil je de chat testen? Neem contact op via",
     "input_placeholder": "Stel een vraag over deze vergadering…"
+  },
+  "speaker": {
+    "not_found": "Spreker niet gevonden.",
+    "function": "Functie",
+    "party": "Partij"
   },
   "status": {
     "DOWNLOADED": "Gedownload",

@@ -37,7 +37,7 @@ test.describe('About page', () => {
     }
 
     test('renders exactly 7 chips', async ({ page }) => {
-      await expect(page.locator('mat-chip-set mat-chip')).toHaveCount(7);
+      await expect(page.locator('.stack-chips .chip')).toHaveCount(7);
     });
   });
 

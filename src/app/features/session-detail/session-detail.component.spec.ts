@@ -7,6 +7,20 @@ import { vi } from 'vitest';
 import { provideTranslateService, TranslateLoader } from '@ngx-translate/core';
 import { TranslateNoOpLoader } from '@ngx-translate/core';
 import { signal } from '@angular/core';
+// mat-tab-group only stamps the *active* tab's body content into the DOM;
+// inactive tabs' content is not rendered until they are selected at least
+// once. Tests that assert on markup inside a non-default tab (Stances is
+// index 1; Summary, index 0, is selected by default) must select it first,
+// by clicking its label — this is how Angular Material's own tests drive
+// tab selection; setting `MatTabGroup.selectedIndex` directly does not
+// stick because it is not template-bound.
+const selectTab = async (fixture: ComponentFixture<unknown>, index: number) => {
+  const tabLabels = fixture.nativeElement.querySelectorAll('[role="tab"]');
+  (tabLabels[index] as HTMLElement).click();
+  fixture.detectChanges();
+  await fixture.whenStable();
+  fixture.detectChanges();
+};
 
 const makeParamMap = (params: Record<string, string>): ParamMap => ({
   has: (key: string) => key in params,
@@ -18,7 +32,7 @@ const makeParamMap = (params: Record<string, string>): ParamMap => ({
 import { SessionDetailComponent } from './session-detail.component';
 import { SessionService } from '../../core/services/session.service';
 import { ChatAuthService } from '../../core/services/chat-auth.service';
-import { PlenarySession } from '../../core/models/session.model';
+import { PlenarySession, Stance } from '../../core/models/session.model';
 
 const mockSession: PlenarySession = {
   id: 'session-abc',
@@ -156,6 +170,7 @@ describe('SessionDetailComponent', () => {
       // unlocked is false by default in beforeEach
       fixture.detectChanges();
       await fixture.whenStable();
+      await selectTab(fixture, 2); // Chat tab — inactive-tab content isn't stamped until selected
 
       const nativeEl: HTMLElement = fixture.nativeElement;
       expect(nativeEl.querySelector('.chat-gate')).not.toBeNull();
@@ -166,6 +181,7 @@ describe('SessionDetailComponent', () => {
       unlockedSignal.set(true);
       fixture.detectChanges();
       await fixture.whenStable();
+      await selectTab(fixture, 2); // Chat tab — inactive-tab content isn't stamped until selected
 
       const nativeEl: HTMLElement = fixture.nativeElement;
       expect(nativeEl.querySelector('.chat-container')).not.toBeNull();
@@ -293,10 +309,11 @@ describe('SessionDetailComponent', () => {
       component.chatPassword.set('');
       fixture.detectChanges();
       await fixture.whenStable();
+      await selectTab(fixture, 2); // Chat tab — inactive-tab content isn't stamped until selected
 
       const nativeEl: HTMLElement = fixture.nativeElement;
       const submitBtn = nativeEl.querySelector<HTMLButtonElement>(
-        '.chat-gate-card button[mat-flat-button]',
+        '.chat-gate-card button.gate-submit',
       );
       expect(submitBtn?.disabled).toBe(true);
     });
@@ -305,10 +322,11 @@ describe('SessionDetailComponent', () => {
       component.chatPassword.set('some-password');
       fixture.detectChanges();
       await fixture.whenStable();
+      await selectTab(fixture, 2); // Chat tab — inactive-tab content isn't stamped until selected
 
       const nativeEl: HTMLElement = fixture.nativeElement;
       const submitBtn = nativeEl.querySelector<HTMLButtonElement>(
-        '.chat-gate-card button[mat-flat-button]',
+        '.chat-gate-card button.gate-submit',
       );
       expect(submitBtn?.disabled).toBe(false);
     });
@@ -318,6 +336,7 @@ describe('SessionDetailComponent', () => {
       component.chatPassword.set('my-password');
       fixture.detectChanges();
       await fixture.whenStable();
+      await selectTab(fixture, 2); // Chat tab — inactive-tab content isn't stamped until selected
 
       const nativeEl: HTMLElement = fixture.nativeElement;
       const input = nativeEl.querySelector<HTMLInputElement>(
@@ -347,6 +366,80 @@ describe('SessionDetailComponent', () => {
       fixture.detectChanges();
 
       expect(component.chatPasswordError()).toBe(false);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Stances tab — speaker link rendering
+  // -------------------------------------------------------------------------
+
+  describe('stances tab — speaker link rendering', () => {
+    // The default `mockSession` (set up in the top-level beforeEach) has a
+    // stance with no `speaker_id`, so it already covers the fallback <span>
+    // branch using the shared `fixture`/`component` from beforeEach.
+    it('renders a plain <span> (no anchor) when stance.speaker_id is null/absent', async () => {
+      await selectTab(fixture, 1); // Stances tab
+
+      const nativeEl: HTMLElement = fixture.nativeElement;
+      const speakerEl = nativeEl.querySelector('.speaker-name');
+
+      expect(speakerEl).not.toBeNull();
+      expect(speakerEl?.tagName).toBe('SPAN');
+      expect(nativeEl.querySelector('a.speaker-name')).toBeNull();
+      expect(speakerEl?.textContent).toContain('Alice');
+    });
+
+    // A stance with a truthy speaker_id requires its own session payload, so
+    // this test rebuilds the TestBed with an override session rather than
+    // reusing the shared fixture from the top-level beforeEach.
+    it('renders a routerLink anchor to /speakers/:id when stance.speaker_id is truthy', async () => {
+      const stanceWithSpeakerId: Stance = {
+        speaker: 'Bob',
+        party: null,
+        speaker_id: 99,
+        activity: 'Speech',
+        stance: 'oppose',
+        summary: 'Bob opposes the bill.',
+        evidence: 'Quote from Bob.',
+        utterance_ids: [],
+      };
+      const sessionWithSpeakerId: PlenarySession = {
+        ...mockSession,
+        stances: { ...mockSession.stances!, stances: [stanceWithSpeakerId] },
+      };
+
+      TestBed.resetTestingModule();
+      mockSessionService.getSession.mockReturnValue(of(sessionWithSpeakerId));
+
+      await TestBed.configureTestingModule({
+        imports: [SessionDetailComponent, FormsModule],
+        providers: [
+          { provide: SessionService, useValue: mockSessionService },
+          { provide: ChatAuthService, useValue: mockChatAuthService },
+          provideAnimationsAsync('noop'),
+          provideRouter([]),
+          {
+            provide: ActivatedRoute,
+            useValue: { paramMap: of(makeParamMap({ id: 'session-abc' })) },
+          },
+          provideTranslateService({
+            loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader },
+          }),
+        ],
+      }).compileComponents();
+
+      const overrideFixture = TestBed.createComponent(SessionDetailComponent);
+      overrideFixture.detectChanges();
+      await overrideFixture.whenStable();
+      await selectTab(overrideFixture, 1); // Stances tab
+
+      const nativeEl: HTMLElement = overrideFixture.nativeElement;
+      const anchor = nativeEl.querySelector<HTMLAnchorElement>('a.speaker-name');
+
+      expect(anchor).not.toBeNull();
+      expect(anchor?.textContent).toContain('Bob');
+      expect(anchor?.getAttribute('href')).toBe('/speakers/99');
+      expect(nativeEl.querySelector('span.speaker-name')).toBeNull();
     });
   });
 });

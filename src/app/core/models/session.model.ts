@@ -44,6 +44,7 @@ export interface StancesResponse {
 export interface Stance {
   speaker: string;
   party: string | null;
+  speaker_id?: number | null;
   activity: string;
   stance: 'support' | 'oppose' | 'unclear';
   summary: string;

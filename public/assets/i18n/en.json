@@ -5,6 +5,7 @@
     "about": "About"
   },
   "home": {
+    "eyebrow": "Tweede Kamer · parliamentary transparency",
     "hero_title": "Parliamentary Session Intelligence",
     "hero_subtitle": "We analyse Dutch parliamentary plenary sessions using AI — automatically extracting summaries, speaker stances, and source references to make democratic debate more accessible and transparent.",
     "cta": "Explore Sessions",
@@ -54,6 +55,11 @@
     "error_wrong_password": "Incorrect access code. Please try again.",
     "gate_contact": "Want to test the chat? Contact me at",
     "input_placeholder": "Ask a question about this session…"
+  },
+  "speaker": {
+    "not_found": "Speaker not found.",
+    "function": "Function",
+    "party": "Party"
   },
   "status": {
     "DOWNLOADED": "Downloaded",
