@@ -12,9 +12,10 @@ export class SessionService {
   private chatAuth = inject(ChatAuthService);
   private base = environment.apiUrl;
 
-  getSessions(skip = 0, limit = 20, title?: string): Observable<SessionListResponse> {
+  getSessions(skip = 0, limit = 20, title?: string, isFinal?: boolean): Observable<SessionListResponse> {
     let params = new HttpParams().set('skip', skip).set('limit', limit).set('status', 'SUMMARISED');
     if (title) params = params.set('title', title);
+    if (isFinal !== undefined) params = params.set('is_final', isFinal);
     return this.http.get<SessionListResponse>(`${this.base}/sessions`, { params });
   }
 

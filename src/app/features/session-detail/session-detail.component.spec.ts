@@ -63,6 +63,7 @@ const mockSession: PlenarySession = {
   stances_en: null,
   summary_sources: [],
   documents: [],
+  is_final: true,
 };
 
 const mockSessionService = {
@@ -440,6 +441,63 @@ describe('SessionDetailComponent', () => {
       expect(anchor?.textContent).toContain('Bob');
       expect(anchor?.getAttribute('href')).toBe('/speakers/99');
       expect(nativeEl.querySelector('span.speaker-name')).toBeNull();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Provisional vs. final session indicators
+  // -------------------------------------------------------------------------
+
+  describe('provisional session indicators', () => {
+    it('does not render .provisional-chip or .provisional-banner when is_final is true', () => {
+      // The default mockSession (is_final: true) is loaded in the top-level beforeEach.
+      const nativeEl: HTMLElement = fixture.nativeElement;
+
+      expect(nativeEl.querySelector('.provisional-chip')).toBeNull();
+      expect(nativeEl.querySelector('.provisional-banner')).toBeNull();
+    });
+
+    // A session with is_final: false requires its own session payload, so this
+    // test rebuilds the TestBed with an override session rather than reusing
+    // the shared fixture from the top-level beforeEach.
+    it('renders .provisional-chip and .provisional-banner when is_final is false', async () => {
+      const provisionalSession: PlenarySession = { ...mockSession, is_final: false };
+
+      TestBed.resetTestingModule();
+      mockSessionService.getSession.mockReturnValue(of(provisionalSession));
+
+      await TestBed.configureTestingModule({
+        imports: [SessionDetailComponent, FormsModule],
+        providers: [
+          { provide: SessionService, useValue: mockSessionService },
+          { provide: ChatAuthService, useValue: mockChatAuthService },
+          provideAnimationsAsync('noop'),
+          provideRouter([]),
+          {
+            provide: ActivatedRoute,
+            useValue: { paramMap: of(makeParamMap({ id: 'session-abc' })) },
+          },
+          provideTranslateService({
+            loader: { provide: TranslateLoader, useClass: TranslateNoOpLoader },
+          }),
+        ],
+      }).compileComponents();
+
+      const overrideFixture = TestBed.createComponent(SessionDetailComponent);
+      overrideFixture.detectChanges();
+      await overrideFixture.whenStable();
+      overrideFixture.detectChanges();
+
+      const nativeEl: HTMLElement = overrideFixture.nativeElement;
+      const chip = nativeEl.querySelector('.provisional-chip');
+      const banner = nativeEl.querySelector('.provisional-banner');
+
+      expect(chip).not.toBeNull();
+      expect(chip?.textContent?.trim()).toBe('sessions.provisional_chip');
+
+      expect(banner).not.toBeNull();
+      expect(banner?.querySelector('strong')?.textContent?.trim()).toBe('detail.provisional_banner_title');
+      expect(banner?.textContent).toContain('detail.provisional_banner_body');
     });
   });
 });

@@ -43,6 +43,33 @@ describe('SessionService', () => {
     req.flush({ total: 0, sessions: [] });
   });
 
+  describe('getSessions() isFinal param', () => {
+    it('sends no is_final param when isFinal is undefined', () => {
+      service.getSessions(0, 20).subscribe();
+
+      const req = httpController.expectOne(r => r.url === `${environment.apiUrl}/sessions`);
+      expect(req.request.params.has('is_final')).toBe(false);
+      req.flush({ total: 0, sessions: [] });
+    });
+
+    it('sends is_final=true when isFinal is true', () => {
+      service.getSessions(0, 20, undefined, true).subscribe();
+
+      const req = httpController.expectOne(r => r.url === `${environment.apiUrl}/sessions`);
+      expect(req.request.params.get('is_final')).toBe('true');
+      req.flush({ total: 0, sessions: [] });
+    });
+
+    it('sends is_final=false when isFinal is false (falsy but must still be sent)', () => {
+      service.getSessions(0, 20, undefined, false).subscribe();
+
+      const req = httpController.expectOne(r => r.url === `${environment.apiUrl}/sessions`);
+      expect(req.request.params.has('is_final')).toBe(true);
+      expect(req.request.params.get('is_final')).toBe('false');
+      req.flush({ total: 0, sessions: [] });
+    });
+  });
+
   it('getSession("abc") sends GET to <apiUrl>/sessions/abc', () => {
     service.getSession('abc').subscribe();
 

@@ -24,8 +24,13 @@
     "read_more": "Lees meer",
     "no_summary": "Samenvatting nog niet beschikbaar.",
     "no_results": "Geen vergaderingen gevonden.",
+    "no_provisional_results": "Op dit moment geen voorlopige vergaderingen.",
     "items_per_page": "Vergaderingen per pagina",
-    "of": "van"
+    "of": "van",
+    "filter_all": "Alle",
+    "filter_final": "Definitief",
+    "filter_provisional": "Voorlopig",
+    "provisional_chip": "Voorlopig"
   },
   "detail": {
     "back": "Terug",
@@ -44,7 +49,9 @@
     "parliamentary_year": "Parlementair jaar",
     "meeting": "Vergadering",
     "chunk": "Fragment",
-    "copy_id": "Klik om te kopiëren"
+    "copy_id": "Klik om te kopiëren",
+    "provisional_banner_title": "Voorlopig transcript.",
+    "provisional_banner_body": "Deze vergadering is gebaseerd op een voorlopig verslag en kan worden bijgewerkt zodra het officiële verslag is gepubliceerd."
   },
   "chat": {
     "gate_heading": "Toegang vereist",

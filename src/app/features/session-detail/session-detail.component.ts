@@ -50,6 +50,9 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
           </button>
           <div class="header-title-row">
             <h1>{{ session()!.title || '—' }}</h1>
+            @if (!session()!.is_final) {
+              <span class="provisional-chip">{{ 'sessions.provisional_chip' | translate }}</span>
+            }
           </div>
           <div class="meta-chips">
             @if (session()!.date) {
@@ -66,6 +69,16 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
             }
           </div>
         </div>
+
+        @if (!session()!.is_final) {
+          <div class="provisional-banner">
+            <mat-icon class="banner-icon">info</mat-icon>
+            <p>
+              <strong>{{ 'detail.provisional_banner_title' | translate }}</strong>
+              {{ 'detail.provisional_banner_body' | translate }}
+            </p>
+          </div>
+        }
 
         <!-- Tabs -->
         <mat-tab-group animationDuration="200ms">
@@ -267,12 +280,26 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
       padding: 20px 24px 24px;
       margin-bottom: 20px;
     }
-    .header-title-row { display: flex; align-items: flex-start; gap: 16px; margin: 12px 0; flex-wrap: wrap; }
+    .header-title-row { display: flex; align-items: center; gap: 16px; margin: 12px 0; flex-wrap: wrap; }
     h1 { font-size: 1.6rem; font-weight: 700; color: var(--ink); margin: 0; flex: 1; }
+    .provisional-chip {
+      font-size: 0.75rem; font-weight: 500; padding: 4px 12px;
+      border-radius: var(--radius); border: 1px solid var(--line); color: var(--anchor);
+      flex-shrink: 0;
+    }
 
     .meta-chips { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; }
     .meta-item { display: flex; align-items: center; gap: 4px; font-size: 0.875rem; color: var(--text-muted); }
     .meta-item mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+    .provisional-banner {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 14px 18px; margin-bottom: 20px;
+    }
+    .provisional-banner .banner-icon { color: var(--anchor); font-size: 20px; width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+    .provisional-banner p { margin: 0; font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+    .provisional-banner p strong { color: var(--ink); font-weight: 600; }
 
     :host ::ng-deep .mat-mdc-tab-header {
       background: var(--surface);
