@@ -1,5 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#1565C0"/>
-  <text x="16" y="23" font-family="Georgia, serif" font-size="20" font-weight="700"
-        text-anchor="middle" fill="white">P</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 52" width="64" height="52" role="img" aria-label="Demos">
+  <g fill="none" stroke="#1c1c1e" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 40 C 19 38 9 33 6 25 C 16 26 27 33 32 40 Z"/>
+    <path d="M32 40 C 45 38 55 33 58 25 C 48 26 37 33 32 40 Z"/>
+    <path d="M32 40 C 23 35 17 25 17 16 C 25 20 30 31 32 40 Z"/>
+    <path d="M32 40 C 41 35 47 25 47 16 C 39 20 34 31 32 40 Z"/>
+    <path d="M32 40 C 27 31 27 18 32 9 C 37 18 37 31 32 40 Z"/>
+    <path d="M12 43 C 24 47 40 47 52 43"/>
+  </g>
+  <circle cx="32" cy="39.5" r="2" fill="#1c1c1e"/>
 </svg>

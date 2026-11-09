@@ -5,6 +5,7 @@
     "about": "About"
   },
   "home": {
+    "eyebrow": "Tweede Kamer · parliamentary transparency",
     "hero_title": "Parliamentary Session Intelligence",
     "hero_subtitle": "We analyse Dutch parliamentary plenary sessions using AI — automatically extracting summaries, speaker stances, and source references to make democratic debate more accessible and transparent.",
     "cta": "Explore Sessions",
@@ -23,8 +24,13 @@
     "read_more": "Read more",
     "no_summary": "Summary not yet available.",
     "no_results": "No sessions found.",
+    "no_provisional_results": "No provisional sessions right now.",
     "items_per_page": "Sessions per page",
-    "of": "of"
+    "of": "of",
+    "filter_all": "All",
+    "filter_final": "Final",
+    "filter_provisional": "Provisional",
+    "provisional_chip": "Provisional"
   },
   "detail": {
     "back": "Back",
@@ -43,17 +49,17 @@
     "parliamentary_year": "Parliamentary year",
     "meeting": "Meeting",
     "chunk": "Chunk",
-    "copy_id": "Click to copy"
+    "copy_id": "Click to copy",
+    "provisional_banner_title": "Provisional transcript.",
+    "provisional_banner_body": "This session is based on a preliminary report and may be updated once the official record is published."
   },
   "chat": {
-    "gate_heading": "Access Required",
-    "gate_description": "Enter the access code to start chatting about this session.",
-    "password_label": "Access code",
-    "password_placeholder": "Enter your access code…",
-    "submit_button": "Unlock",
-    "error_wrong_password": "Incorrect access code. Please try again.",
-    "gate_contact": "Want to test the chat? Contact me at",
     "input_placeholder": "Ask a question about this session…"
+  },
+  "speaker": {
+    "not_found": "Speaker not found.",
+    "function": "Function",
+    "party": "Party"
   },
   "status": {
     "DOWNLOADED": "Downloaded",

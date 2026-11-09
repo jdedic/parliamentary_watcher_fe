@@ -17,14 +17,16 @@ import { SessionStatus } from '../../core/models/session.model';
       font-size: 0.65rem;
       font-weight: 500;
       padding: 4px 12px;
-      border-radius: 16px;
+      border-radius: var(--radius);
       display: inline-block;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--ink);
     }
-    .status-downloaded { background: #e0e0e0; color: #616161; }
-    .status-chunk_summarised { background: #bbdefb; color: #1565c0; }
-    .status-summarised { background: #c8e6c9; color: #2e7d32; }
-    .status-failed { background: #ffcdd2; color: #c62828; }
+    .status-downloaded { color: var(--text-muted); }
+    .status-chunk_summarised { color: var(--anchor); }
+    .status-summarised { color: var(--stance-support); }
+    .status-failed { color: var(--stance-oppose); }
   `],
 })
 export class StatusBadgeComponent {

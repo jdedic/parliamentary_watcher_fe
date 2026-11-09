@@ -9,6 +9,7 @@ export interface PlenarySessionListItem {
   status: SessionStatus | null;
   meeting_number: number | null;
   parliamentary_year: string | null;
+  is_final: boolean;
 }
 
 export interface SessionListResponse {
@@ -31,6 +32,7 @@ export interface PlenarySession {
   summary_en: string | null;
   stances_en: StancesResponse | null;
   documents: SessionDocument[];
+  is_final: boolean;
 }
 
 export type SessionStatus = 'DOWNLOADED' | 'FAILED' | 'CHUNK_SUMMARISED' | 'SUMMARISED';
@@ -44,6 +46,7 @@ export interface StancesResponse {
 export interface Stance {
   speaker: string;
   party: string | null;
+  speaker_id?: number | null;
   activity: string;
   stance: 'support' | 'oppose' | 'unclear';
   summary: string;

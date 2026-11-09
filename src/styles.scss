@@ -1,13 +1,84 @@
 @use '@angular/material' as mat;
+@use 'sass:string';
 
 @include mat.core();
 
-$primary-palette: mat.m2-define-palette(mat.$m2-blue-palette, 800, 600, 900);
-$accent-palette:  mat.m2-define-palette(mat.$m2-blue-grey-palette, 600);
+:root {
+  /* Surfaces */
+  --paper: #faf7f2;
+  --surface: #ffffff;
+
+  /* Text */
+  --ink: #1c1c1e;
+  --text-muted: #8a857c;
+
+  /* Lines */
+  --line: #e7e1d6;
+
+  /* Accent — amber. RESERVED: only ever marks source-linked evidence, plus one CTA per view. */
+  --accent: #e0a526;
+  --on-accent: #3a2c07;
+
+  /* Anchor — cool slate for structural weight (focus rings, primary Material palette) */
+  --anchor: #3c4a57;
+
+  /* Stance classification colours (never party colours) */
+  --stance-support: #2f6e73;
+  --stance-oppose: #a8622a;
+  --stance-unclear: var(--text-muted);
+
+  /* Type roles */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-voice: 'Source Serif 4', Georgia, serif;
+
+  /* Radius + elevation */
+  --radius: 10px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgba(28, 28, 30, .05);
+}
+
+$demos-anchor-palette: (
+  50: #e8eaec,
+  100: #c5cbd0,
+  200: #9fa9b1,
+  300: #798792,
+  400: #5d6d79,
+  500: #3c4a57,
+  600: #36434f,
+  700: #2d3a45,
+  800: #25313c,
+  900: #17232d,
+  A100: #9fa9b1,
+  A200: #798792,
+  A400: #5d6d79,
+  A700: #17232d,
+  contrast: (
+    50: rgba(black, .87),
+    100: rgba(black, .87),
+    200: rgba(black, .87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, .87),
+    A200: white,
+    A400: white,
+    A700: white,
+  ),
+);
+
+$primary-palette: mat.m2-define-palette($demos-anchor-palette, 500, 300, 700);
+$accent-palette:  mat.m2-define-palette($demos-anchor-palette, 500);
 
 $theme: mat.m2-define-light-theme((
   color: (primary: $primary-palette, accent: $accent-palette),
-  typography: mat.m2-define-typography-config(),
+  typography: mat.m2-define-typography-config(
+    $font-family: string.unquote('Inter, system-ui, sans-serif'),
+  ),
   density: 0,
 ));
 
@@ -17,9 +88,13 @@ $theme: mat.m2-define-light-theme((
 
 body {
   margin: 0;
-  background: #F5F7FA;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
-  color: #1a1a2e;
+  background: var(--paper);
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
 }
 
 .app-content {
@@ -29,10 +104,10 @@ body {
 a { text-decoration: none; }
 
 .summary-text h1, .summary-text h2, .summary-text h3 {
-  color: #1565C0; font-weight: 600; margin: 1.2em 0 0.4em;
+  color: var(--ink); font-weight: 600; margin: 1.2em 0 0.4em;
 }
 .summary-text h1 { font-size: 1.2rem; }
-.summary-text h2 { font-size: 1.05rem; border-bottom: 1px solid #bbdefb; padding-bottom: 4px; }
+.summary-text h2 { font-size: 1.05rem; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
 .summary-text h3 { font-size: 0.95rem; }
-.summary-text p { margin: 0 0 0.4em; line-height: 1.8; color: #37474F; }
-.summary-text strong { font-weight: 600; color: #1565C0; }
+.summary-text p { margin: 0 0 0.4em; line-height: 1.8; color: var(--text-muted); }
+.summary-text strong { font-weight: 600; color: var(--ink); }

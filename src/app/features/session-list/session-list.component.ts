@@ -40,10 +40,24 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
                [placeholder]="'sessions.search_placeholder' | translate">
       </mat-form-field>
 
+      <div class="finality-filter">
+        <button [class.filter-active]="finalityFilter() === 'all'" (click)="setFinalityFilter('all')">
+          {{ 'sessions.filter_all' | translate }}
+        </button>
+        <button [class.filter-active]="finalityFilter() === 'final'" (click)="setFinalityFilter('final')">
+          {{ 'sessions.filter_final' | translate }}
+        </button>
+        <button [class.filter-active]="finalityFilter() === 'provisional'" (click)="setFinalityFilter('provisional')">
+          {{ 'sessions.filter_provisional' | translate }}
+        </button>
+      </div>
+
       @if (loading()) {
         <div class="spinner-wrap"><mat-spinner diameter="48"></mat-spinner></div>
       } @else if (sessions().length === 0) {
-        <p class="empty-msg">{{ 'sessions.no_results' | translate }}</p>
+        <p class="empty-msg">
+          {{ (finalityFilter() === 'provisional' ? 'sessions.no_provisional_results' : 'sessions.no_results') | translate }}
+        </p>
       } @else {
         <div class="card-grid">
           @for (session of sessions(); track session.id) {
@@ -56,6 +70,9 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
                 <span class="session-date">{{ session.date | date:'d MMMM yyyy' }}</span>
                 @if (session.status) {
                   <app-status-badge [status]="session.status"></app-status-badge>
+                }
+                @if (!session.is_final) {
+                  <span class="provisional-chip">{{ 'sessions.provisional_chip' | translate }}</span>
                 }
               </div>
               <h2 class="card-title">{{ session.title || '—' }}</h2>
@@ -92,32 +109,52 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
   `,
   styles: [`
     .list-container { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
-    h1 { font-size: 1.75rem; font-weight: 700; color: #1565C0; margin-bottom: 24px; }
-    .search-field { width: 100%; max-width: 480px; margin-bottom: 32px; }
+    h1 { font-size: 1.75rem; font-weight: 700; color: var(--ink); margin-bottom: 24px; }
+    .search-field { width: 100%; max-width: 480px; margin-bottom: 16px; }
+    .finality-filter {
+      display: inline-flex; gap: 4px; padding: 4px;
+      background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+      margin-bottom: 32px;
+    }
+    .finality-filter button {
+      font-family: var(--font-body); font-size: 0.85rem; font-weight: 500;
+      color: var(--text-muted); background: transparent; border: none;
+      padding: 6px 14px; border-radius: calc(var(--radius) - 4px); cursor: pointer;
+    }
+    .finality-filter button:hover { color: var(--ink); }
+    .finality-filter button.filter-active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-card); }
+    .provisional-chip {
+      font-size: 0.75rem; font-weight: 500; padding: 4px 12px;
+      border-radius: var(--radius); border: 1px solid var(--line); color: var(--anchor);
+    }
     .spinner-wrap { display: flex; justify-content: center; padding: 60px; }
-    .empty-msg { color: #78909C; font-size: 1rem; text-align: center; padding: 60px 0; }
+    .empty-msg { color: var(--text-muted); font-size: 1rem; text-align: center; padding: 60px 0; }
     .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 24px;
       margin-bottom: 32px;
     }
-    .session-card { padding: 24px; display: flex; flex-direction: column; gap: 10px; }
-    .card-meta { display: flex; align-items: center; justify-content: space-between; }
-    .meeting-label { font-size: 0.8rem; color: #78909C; font-weight: 500; }
+    .session-card {
+      padding: 24px; display: flex; flex-direction: column; gap: 10px;
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+    }
+    .card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    .meeting-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
     .session-date {
       font-size: 0.8rem;
       font-weight: 500;
       padding: 4px 12px;
-      border-radius: 16px;
-      background: #e0e0e0;
-      color: #616161;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      border-radius: var(--radius);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--ink);
     }
     .card-title {
       font-size: 1.05rem;
-      font-weight: 600;
-      color: #1a1a2e;
+      font-weight: 500;
+      color: var(--ink);
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -129,12 +166,12 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
       flex-wrap: wrap;
       gap: 8px;
       font-size: 0.85rem;
-      color: #546E7A;
+      color: var(--text-muted);
       margin: 8px 0 0;
     }
     .detail-item { font-weight: 500; }
-    .detail-separator { color: #9e9e9e; }
-    .card-excerpt { font-size: 0.9rem; color: #546E7A; line-height: 1.6; flex: 1; margin: 0; font-style: italic; }
+    .detail-separator { color: var(--line); }
+    .card-excerpt { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; flex: 1; margin: 0; font-style: italic; }
     .card-footer { margin-top: 8px; }
   `],
 })
@@ -147,6 +184,7 @@ export class SessionListComponent implements OnInit {
   total = signal(0);
   loading = signal(false);
   currentLang = signal(this.translateService.currentLang ?? 'en');
+  finalityFilter = signal<'all' | 'final' | 'provisional'>('all');
   searchTerm = '';
   pageSize = 20;
   currentSkip = 0;
@@ -180,9 +218,24 @@ export class SessionListComponent implements OnInit {
     this.loadSessions(this.searchTerm);
   }
 
+  setFinalityFilter(filter: 'all' | 'final' | 'provisional') {
+    if (this.finalityFilter() === filter) return;
+    this.finalityFilter.set(filter);
+    this.currentSkip = 0;
+    this.currentPageIndex = 0;
+    this.loadSessions(this.searchTerm);
+  }
+
+  private isFinalParam(): boolean | undefined {
+    const filter = this.finalityFilter();
+    if (filter === 'final') return true;
+    if (filter === 'provisional') return false;
+    return undefined;
+  }
+
   private loadSessions(title?: string) {
     this.loading.set(true);
-    this.sessionService.getSessions(this.currentSkip, this.pageSize, title || undefined)
+    this.sessionService.getSessions(this.currentSkip, this.pageSize, title || undefined, this.isFinalParam())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: res => {

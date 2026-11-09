@@ -16,11 +16,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTableModule } from '@angular/material/table';
 
 import { SessionService } from '../../core/services/session.service';
-import { ChatAuthService } from '../../core/services/chat-auth.service';
 import { PlenarySession, Stance, SummarySource } from '../../core/models/session.model';
-import { ChatMessage } from '../../core/models/chat.model';
+import { ChatMessage, ChunkDetail } from '../../core/models/chat.model';
 import { StanceChipComponent } from '../../shared/stance-chip/stance-chip.component';
 import { MarkdownPipe } from '../../shared/markdown.pipe';
 
@@ -33,6 +33,7 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
     MatTabsModule, MatButtonModule, MatIconModule, MatCardModule,
     MatExpansionModule, MatProgressSpinnerModule, MatChipsModule,
     MatTooltipModule, MatSnackBarModule, MatInputModule, MatFormFieldModule,
+    MatTableModule,
     StanceChipComponent, MarkdownPipe,
   ],
   template: `
@@ -48,6 +49,9 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
           </button>
           <div class="header-title-row">
             <h1>{{ session()!.title || '—' }}</h1>
+            @if (!session()!.is_final) {
+              <span class="provisional-chip">{{ 'sessions.provisional_chip' | translate }}</span>
+            }
           </div>
           <div class="meta-chips">
             @if (session()!.date) {
@@ -64,6 +68,16 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
             }
           </div>
         </div>
+
+        @if (!session()!.is_final) {
+          <div class="provisional-banner">
+            <mat-icon class="banner-icon">info</mat-icon>
+            <p>
+              <strong>{{ 'detail.provisional_banner_title' | translate }}</strong>
+              {{ 'detail.provisional_banner_body' | translate }}
+            </p>
+          </div>
+        }
 
         <!-- Tabs -->
         <mat-tab-group animationDuration="200ms">
@@ -88,7 +102,11 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
                     <mat-card class="stance-card">
                       <div class="stance-header">
                         <div>
-                          <span class="speaker-name">{{ stance.speaker }}</span>
+                          @if (stance.speaker_id) {
+                            <a class="speaker-name" [routerLink]="['/speakers', stance.speaker_id]">{{ stance.speaker }}</a>
+                          } @else {
+                            <span class="speaker-name">{{ stance.speaker }}</span>
+                          }
                           @if (stance.party) {
                             <span class="party-label"> ({{ stance.party }})</span>
                           }
@@ -124,78 +142,86 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
           <mat-tab [label]="'detail.tab_chat' | translate">
             <div class="tab-content">
 
-              @if (!chatAuthService.unlocked()) {
-                <!-- Password gate -->
-                <div class="chat-gate">
-                  <mat-card class="chat-gate-card">
-                    <mat-icon class="gate-icon">lock</mat-icon>
-                    <h2>{{ 'chat.gate_heading' | translate }}</h2>
-                    <p class="gate-contact">
-                      {{ 'chat.gate_contact' | translate }}
-                      <a href="mailto:jelena.dedic.it@gmail.com">jelena.dedic.it@gmail.com</a>
-                    </p>
-
-                    <mat-form-field appearance="outline" class="gate-field">
-                      <mat-label>{{ 'chat.password_label' | translate }}</mat-label>
-                      <input matInput
-                             type="password"
-                             [ngModel]="chatPassword()"
-                             (ngModelChange)="chatPassword.set($event); chatPasswordError.set(false)"
-                             (keydown.enter)="submitChatPassword()"
-                             [placeholder]="'chat.password_placeholder' | translate"
-                             [disabled]="chatPasswordLoading()">
-                    </mat-form-field>
-
-                    @if (chatPasswordError()) {
-                      <p class="gate-error">{{ 'chat.error_wrong_password' | translate }}</p>
-                    }
-
-                    <button mat-flat-button color="primary"
-                            (click)="submitChatPassword()"
-                            [disabled]="!chatPassword().trim() || chatPasswordLoading()">
-                      @if (chatPasswordLoading()) {
-                        <mat-spinner diameter="20"></mat-spinner>
-                      } @else {
-                        {{ 'chat.submit_button' | translate }}
-                      }
-                    </button>
-                  </mat-card>
-                </div>
-
-              } @else {
-                <!-- Chat interface -->
-                <div class="chat-container">
-                  <div class="chat-messages">
-                    @for (msg of chatHistory(); track $index) {
-                      <div [class]="'chat-bubble chat-' + msg.role">
-                        <div [innerHTML]="msg.content | markdown"></div>
-                      </div>
-                    }
-                    @if (chatLoading()) {
-                      <div class="chat-bubble chat-assistant chat-loading">
-                        <mat-spinner diameter="20"></mat-spinner>
-                      </div>
-                    }
-                  </div>
-                  @if (chatError()) {
-                    <p class="chat-error">{{ chatError() }}</p>
+              <!-- Chat interface -->
+              <div class="chat-container">
+                <div class="chat-messages">
+                  @for (msg of chatHistory(); track $index) {
+                    <div [class]="'chat-bubble chat-' + msg.role">
+                      <div [innerHTML]="msg.content | markdown"></div>
+                    </div>
                   }
-                  <div class="chat-input-row">
-                    <mat-form-field appearance="outline" class="chat-field" subscriptSizing="dynamic">
-                      <input matInput [(ngModel)]="chatInput"
-                             (keydown.enter)="sendMessage()"
-                             [placeholder]="'chat.input_placeholder' | translate"
-                             maxlength="200">
-                    </mat-form-field>
-                    <button class="chat-send-btn" (click)="sendMessage()" [disabled]="chatLoading()">
-                      <mat-icon>send</mat-icon>
-                    </button>
-                  </div>
+                  @if (chatLoading()) {
+                    <div class="chat-bubble chat-assistant chat-loading">
+                      <mat-spinner diameter="20"></mat-spinner>
+                    </div>
+                  }
                 </div>
-              }
+                @if (chatError()) {
+                  <p class="chat-error">{{ chatError() }}</p>
+                }
+                <div class="chat-input-row">
+                  <mat-form-field appearance="outline" class="chat-field" subscriptSizing="dynamic">
+                    <input matInput [(ngModel)]="chatInput"
+                           (keydown.enter)="sendMessage()"
+                           [placeholder]="'chat.input_placeholder' | translate"
+                           maxlength="200">
+                  </mat-form-field>
+                  <button class="chat-send-btn" (click)="sendMessage()" [disabled]="chatLoading()">
+                    <mat-icon>send</mat-icon>
+                  </button>
+                </div>
+              </div>
 
             </div>
           </mat-tab>
+
+          <!-- Retrieval tab (debug-only, enable via window.enableRetrievalTab() in console) -->
+          @if (debugMode()) {
+            <mat-tab label="Retrieval">
+              <div class="tab-content">
+                @if (lastChunks().length === 0) {
+                  <p class="empty-placeholder">Ask a question in the Chat tab to see retrieval details.</p>
+                } @else {
+                  <table mat-table [dataSource]="lastChunks()" class="retrieval-table">
+                    <ng-container matColumnDef="rank">
+                      <th mat-header-cell *matHeaderCellDef>#</th>
+                      <td mat-cell *matCellDef="let c; let i = index">{{ i + 1 }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="chunk_id">
+                      <th mat-header-cell *matHeaderCellDef>Chunk ID</th>
+                      <td mat-cell *matCellDef="let c" class="mono">{{ c.chunk_id.slice(0, 8) }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="rrf_score">
+                      <th mat-header-cell *matHeaderCellDef>RRF score</th>
+                      <td mat-cell *matCellDef="let c">{{ c.rrf_score }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="rerank_score">
+                      <th mat-header-cell *matHeaderCellDef>Rerank score</th>
+                      <td mat-cell *matCellDef="let c">{{ c.rerank_score ?? '—' }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="chunk_index">
+                      <th mat-header-cell *matHeaderCellDef>Index</th>
+                      <td mat-cell *matCellDef="let c">{{ c.chunk_index ?? '—' }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="type">
+                      <th mat-header-cell *matHeaderCellDef>Type</th>
+                      <td mat-cell *matCellDef="let c">
+                        <span [class]="c.is_neighbor ? 'badge-neighbor' : 'badge-retrieved'">
+                          {{ c.is_neighbor ? 'neighbor' : 'retrieved' }}
+                        </span>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="speakers">
+                      <th mat-header-cell *matHeaderCellDef>Speakers</th>
+                      <td mat-cell *matCellDef="let c">{{ c.speakers.join(', ') || '—' }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="retrievalColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: retrievalColumns"></tr>
+                  </table>
+                }
+              </div>
+            </mat-tab>
+          }
 
         </mat-tab-group>
       </div>
@@ -206,84 +232,106 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
     .detail-container { max-width: 1000px; margin: 0 auto; padding: 28px 24px 48px; }
 
     .detail-header {
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
       padding: 20px 24px 24px;
       margin-bottom: 20px;
     }
-    .header-title-row { display: flex; align-items: flex-start; gap: 16px; margin: 12px 0; flex-wrap: wrap; }
-    h1 { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; margin: 0; flex: 1; }
+    .header-title-row { display: flex; align-items: center; gap: 16px; margin: 12px 0; flex-wrap: wrap; }
+    h1 { font-size: 1.6rem; font-weight: 700; color: var(--ink); margin: 0; flex: 1; }
+    .provisional-chip {
+      font-size: 0.75rem; font-weight: 500; padding: 4px 12px;
+      border-radius: var(--radius); border: 1px solid var(--line); color: var(--anchor);
+      flex-shrink: 0;
+    }
 
     .meta-chips { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; }
-    .meta-item { display: flex; align-items: center; gap: 4px; font-size: 0.875rem; color: #546E7A; }
+    .meta-item { display: flex; align-items: center; gap: 4px; font-size: 0.875rem; color: var(--text-muted); }
     .meta-item mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
+    .provisional-banner {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 14px 18px; margin-bottom: 20px;
+    }
+    .provisional-banner .banner-icon { color: var(--anchor); font-size: 20px; width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+    .provisional-banner p { margin: 0; font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+    .provisional-banner p strong { color: var(--ink); font-weight: 600; }
+
     :host ::ng-deep .mat-mdc-tab-header {
-      background: white;
-      border: 1px solid #e0e0e0;
+      background: var(--surface);
+      border: 1px solid var(--line);
       border-bottom: none;
-      border-radius: 8px 8px 0 0;
+      border-radius: var(--radius) var(--radius) 0 0;
     }
     :host ::ng-deep .mat-mdc-tab-body-wrapper {
-      background: white;
-      border: 1px solid #e0e0e0;
+      background: var(--surface);
+      border: 1px solid var(--line);
       border-top: none;
-      border-radius: 0 0 8px 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: var(--shadow-card);
     }
 
     .tab-content { padding: 28px 24px; }
-    .summary-text { font-size: 1rem; line-height: 1.8; color: #37474F; white-space: pre-wrap; }
-    .empty-placeholder { color: #90A4AE; font-style: italic; }
+    .summary-text { font-size: 1rem; line-height: 1.8; color: var(--text-muted); white-space: pre-wrap; }
+    .empty-placeholder { color: var(--text-muted); font-style: italic; }
 
     .stances-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-    .stance-card { padding: 20px; display: flex; flex-direction: column; }
+    .stance-card {
+      padding: 20px; display: flex; flex-direction: column;
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+    }
     .stance-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .speaker-name { font-weight: 600; color: #1a1a2e; }
-    .party-label { color: #546E7A; }
-    .activity-label { font-size: 0.8rem; color: #90A4AE; font-style: italic; margin: 4px 0 0; }
-    .stance-summary { font-size: 0.9rem; color: #37474F; line-height: 1.6; margin-bottom: 12px; flex: 1; }
-    .evidence-panel { margin-bottom: 12px; box-shadow: none !important; border: 1px solid #e0e0e0; }
-    .evidence-quote { border-left: 3px solid #1565C0; padding: 8px 16px; color: #546E7A; font-style: italic; margin: 0; }
-    .utterance-count { display: flex; align-items: center; gap: 4px; font-size: 0.78rem; color: #90A4AE; margin: 0; }
+    .speaker-name { font-weight: 600; color: var(--ink); }
+    a.speaker-name { text-decoration: none; cursor: pointer; }
+    a.speaker-name:hover { color: var(--anchor); text-decoration: underline; }
+    .party-label { color: var(--text-muted); }
+    .activity-label { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin: 4px 0 0; }
+    .stance-summary { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; flex: 1; }
+    .evidence-panel { margin-bottom: 12px; box-shadow: none !important; border: 1px solid var(--line); }
+    .evidence-quote {
+      font-family: var(--font-voice);
+      border-left: 3px solid var(--accent);
+      background: rgba(224, 165, 38, 0.06);
+      padding: 8px 16px; color: var(--ink); margin: 0;
+    }
+    .utterance-count { display: flex; align-items: center; gap: 4px; font-size: 0.78rem; color: var(--text-muted); margin: 0; }
     .small-icon { font-size: 14px; width: 14px; height: 14px; }
 
     .uid-list { display: flex; flex-direction: column; gap: 8px; padding: 8px 0; }
     .uid-chip {
-      font-family: monospace; font-size: 0.78rem; background: #F5F7FA;
-      padding: 6px 12px; border-radius: 4px; cursor: pointer; color: #1565C0;
-      border: 1px solid #e0e0e0;
+      font-family: monospace; font-size: 0.78rem; background: var(--paper);
+      padding: 6px 12px; border-radius: 4px; cursor: pointer; color: var(--anchor);
+      border: 1px solid var(--line);
     }
-    .uid-chip:hover { background: #E3F2FD; }
+    .uid-chip:hover { background: var(--line); }
 
 .chat-container { display: flex; flex-direction: column; height: 520px; }
     .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 16px 0; }
     .chat-bubble { max-width: 75%; padding: 10px 16px; border-radius: 16px; font-size: 0.9rem; line-height: 1.6; }
-    .chat-user { align-self: flex-end; background: #1565C0; color: #fff; border-bottom-right-radius: 4px; }
-    .chat-assistant { align-self: flex-start; background: #fff; color: #37474F; border: 1px solid #e0e0e0; border-bottom-left-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+    .chat-user { align-self: flex-end; background: var(--anchor); color: #fff; border-bottom-right-radius: 4px; }
+    .chat-assistant { align-self: flex-start; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-bottom-left-radius: 4px; box-shadow: var(--shadow-card); }
     .chat-loading { padding: 12px 16px; }
-    .chat-input-row { display: flex; gap: 8px; align-items: center; padding-top: 8px; border-top: 1px solid #e0e0e0; }
+    .chat-input-row { display: flex; gap: 8px; align-items: center; padding-top: 8px; border-top: 1px solid var(--line); }
     .chat-field { flex: 1; }
     .chat-send-btn {
       height: 56px; width: 56px; flex-shrink: 0;
-      background: #1565C0; color: #fff; border: none; border-radius: 4px;
+      background: var(--anchor); color: #fff; border: none; border-radius: var(--radius);
       cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
     .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .chat-send-btn mat-icon { font-size: 24px; width: 24px; height: 24px; line-height: 24px; }
-    .chat-error { color: #c62828; font-size: 0.85rem; margin: 4px 0 8px; text-align: center; }
+    .chat-error { color: var(--stance-oppose); font-size: 0.85rem; margin: 4px 0 8px; text-align: center; }
 
-    .chat-gate { display: flex; justify-content: center; padding: 48px 16px; }
-    .chat-gate-card { max-width: 420px; width: 100%; padding: 40px 32px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
-    .gate-icon { font-size: 48px; width: 48px; height: 48px; color: #1565C0; }
-    .chat-gate-card h2 { font-size: 1.25rem; font-weight: 600; color: #1a1a2e; margin: 0; }
-    .gate-description { font-size: 0.9rem; color: #546E7A; margin: 0; }
-    .gate-contact { font-size: 0.85rem; color: #546E7A; margin: 0; }
-    .gate-contact a { color: #1565C0; }
-    .gate-field { width: 100%; }
-    .gate-error { color: #c62828; font-size: 0.85rem; margin: 0; }
+    .retrieval-table { width: 100%; }
+    .retrieval-table th { font-weight: 500; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .retrieval-table td { font-size: 0.875rem; color: var(--ink); }
+    .mono { font-family: monospace; font-size: 0.8rem; }
+    .badge-retrieved, .badge-neighbor { background: var(--paper); color: var(--ink); border: 1px solid var(--line); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
+    .badge-neighbor { color: var(--text-muted); }
   `],
 })
 export class SessionDetailComponent implements OnInit {
@@ -292,7 +340,6 @@ export class SessionDetailComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
-  chatAuthService = inject(ChatAuthService);
 
   session = signal<PlenarySession | null>(null);
   loading = signal(true);
@@ -317,11 +364,16 @@ export class SessionDetailComponent implements OnInit {
   chatLoading = signal(false);
   chatError = signal<string | null>(null);
 
-  chatPassword = signal('');
-  chatPasswordError = signal(false);
-  chatPasswordLoading = signal(false);
+  lastChunks = signal<ChunkDetail[]>([]);
+  readonly retrievalColumns = ['rank', 'chunk_id', 'rrf_score', 'rerank_score', 'chunk_index', 'type', 'speakers'];
+  debugMode = signal(localStorage.getItem('debugRetrieval') === '1');
 
   ngOnInit() {
+    (window as any).enableRetrievalTab = (enabled: boolean = true) => {
+      localStorage.setItem('debugRetrieval', enabled ? '1' : '0');
+      this.debugMode.set(enabled);
+    };
+
     this.translateService.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(e => this.currentLang.set(e.lang));
@@ -341,25 +393,6 @@ export class SessionDetailComponent implements OnInit {
       });
   }
 
-  submitChatPassword(): void {
-    const pwd = this.chatPassword().trim();
-    if (!pwd || this.chatPasswordLoading()) return;
-    this.chatPasswordError.set(false);
-    this.chatPasswordLoading.set(true);
-    this.sessionService.verifyChat(pwd)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.chatAuthService.unlock(pwd);
-          this.chatPasswordLoading.set(false);
-        },
-        error: () => {
-          this.chatPasswordError.set(true);
-          this.chatPasswordLoading.set(false);
-        },
-      });
-  }
-
   sendMessage() {
     const msg = this.chatInput.trim();
     if (!msg || msg.length > 200 || this.chatLoading()) return;
@@ -374,6 +407,7 @@ export class SessionDetailComponent implements OnInit {
       .subscribe({
         next: res => {
           this.chatHistory.update(h => [...h, { role: 'assistant', content: res.answer }]);
+          this.lastChunks.set(res.chunks ?? []);
           this.chatLoading.set(false);
         },
         error: (err) => {

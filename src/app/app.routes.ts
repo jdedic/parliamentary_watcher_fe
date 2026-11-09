@@ -14,6 +14,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/session-detail/session-detail.component').then(m => m.SessionDetailComponent),
   },
   {
+    path: 'speakers/:id',
+    loadComponent: () => import('./features/speaker-detail/speaker-detail.component').then(m => m.SpeakerDetailComponent),
+  },
+  {
     path: 'about',
     loadComponent: () => import('./features/about/about.component').then(m => m.AboutComponent),
   },

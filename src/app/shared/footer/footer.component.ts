@@ -9,7 +9,7 @@ import { TranslateModule } from '@ngx-translate/core';
   imports: [RouterLink, RouterLinkActive, TranslateModule],
   template: `
     <footer class="footer">
-      <span class="copyright">&copy; 2026 ParlAI</span>
+      <span class="copyright">&copy; 2026 Demos</span>
       <nav class="footer-nav">
         <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
           {{ 'nav.home' | translate }}
@@ -25,22 +25,23 @@ import { TranslateModule } from '@ngx-translate/core';
   `,
   styles: [`
     .footer {
-      background: #1565C0;
-      color: rgba(255,255,255,0.85);
+      background: var(--paper);
+      border-top: 1px solid var(--line);
+      color: var(--text-muted);
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1rem 2rem;
       font-size: 0.9rem;
     }
-    .copyright { color: rgba(255,255,255,0.7); }
+    .copyright { color: var(--text-muted); font-family: var(--font-display); }
     .footer-nav { display: flex; gap: 1.5rem; }
     .footer-nav a {
-      color: rgba(255,255,255,0.85);
+      color: var(--text-muted);
       text-decoration: none;
     }
-    .footer-nav a:hover { color: white; }
-    .active-link { color: white; text-decoration: underline; }
+    .footer-nav a:hover { color: var(--ink); }
+    .active-link { color: var(--ink); border-bottom: 2px solid var(--anchor); }
   `],
 })
 export class FooterComponent {}

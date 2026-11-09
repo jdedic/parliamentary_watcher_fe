@@ -5,6 +5,7 @@
     "about": "Over ons"
   },
   "home": {
+    "eyebrow": "Tweede Kamer · parlementaire transparantie",
     "hero_title": "Parlementaire Vergaderingintelligentie",
     "hero_subtitle": "Wij analyseren plenaire vergaderingen van de Tweede Kamer met behulp van AI — we extraheren automatisch samenvattingen, standpunten van sprekers en bronverwijzingen om het democratisch debat toegankelijker en transparanter te maken.",
     "cta": "Bekijk vergaderingen",
@@ -23,8 +24,13 @@
     "read_more": "Lees meer",
     "no_summary": "Samenvatting nog niet beschikbaar.",
     "no_results": "Geen vergaderingen gevonden.",
+    "no_provisional_results": "Op dit moment geen voorlopige vergaderingen.",
     "items_per_page": "Vergaderingen per pagina",
-    "of": "van"
+    "of": "van",
+    "filter_all": "Alle",
+    "filter_final": "Definitief",
+    "filter_provisional": "Voorlopig",
+    "provisional_chip": "Voorlopig"
   },
   "detail": {
     "back": "Terug",
@@ -43,17 +49,17 @@
     "parliamentary_year": "Parlementair jaar",
     "meeting": "Vergadering",
     "chunk": "Fragment",
-    "copy_id": "Klik om te kopiëren"
+    "copy_id": "Klik om te kopiëren",
+    "provisional_banner_title": "Voorlopig transcript.",
+    "provisional_banner_body": "Deze vergadering is gebaseerd op een voorlopig verslag en kan worden bijgewerkt zodra het officiële verslag is gepubliceerd."
   },
   "chat": {
-    "gate_heading": "Toegang vereist",
-    "gate_description": "Voer de toegangscode in om over deze vergadering te chatten.",
-    "password_label": "Toegangscode",
-    "password_placeholder": "Voer uw toegangscode in…",
-    "submit_button": "Ontgrendelen",
-    "error_wrong_password": "Onjuiste toegangscode. Probeer het opnieuw.",
-    "gate_contact": "Wil je de chat testen? Neem contact op via",
     "input_placeholder": "Stel een vraag over deze vergadering…"
+  },
+  "speaker": {
+    "not_found": "Spreker niet gevonden.",
+    "function": "Functie",
+    "party": "Partij"
   },
   "status": {
     "DOWNLOADED": "Gedownload",
