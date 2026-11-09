@@ -7,19 +7,19 @@ test.describe('Navbar', () => {
     });
 
     test('renders the Demos brand', async ({ page }) => {
-      await expect(page.getByText('Demos')).toBeVisible();
+      await expect(page.getByRole('banner').getByRole('link', { name: 'Demos' })).toBeVisible();
     });
 
     test('renders Home nav link', async ({ page }) => {
-      await expect(page.getByRole('link', { name: 'Home' })).toBeVisible();
+      await expect(page.getByRole('banner').getByRole('link', { name: 'Home' })).toBeVisible();
     });
 
     test('renders Plenary Sessions nav link', async ({ page }) => {
-      await expect(page.getByRole('link', { name: 'Plenary Sessions' })).toBeVisible();
+      await expect(page.getByRole('banner').getByRole('link', { name: 'Plenary Sessions' })).toBeVisible();
     });
 
     test('renders About nav link', async ({ page }) => {
-      await expect(page.getByRole('link', { name: 'About' })).toBeVisible();
+      await expect(page.getByRole('banner').getByRole('link', { name: 'About' })).toBeVisible();
     });
 
     test('renders EN and NL language buttons', async ({ page }) => {
@@ -34,7 +34,7 @@ test.describe('Navbar', () => {
         route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ total: 0, sessions: [] }) })
       );
       await page.goto('/sessions');
-      await page.getByText('Demos').click();
+      await page.getByRole('banner').getByRole('link', { name: 'Demos' }).click();
       await page.waitForURL('/');
       await expect(page).toHaveURL('/');
     });
@@ -44,21 +44,21 @@ test.describe('Navbar', () => {
         route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ total: 0, sessions: [] }) })
       );
       await page.goto('/');
-      await page.getByRole('link', { name: 'Plenary Sessions' }).click();
+      await page.getByRole('banner').getByRole('link', { name: 'Plenary Sessions' }).click();
       await page.waitForURL('/sessions');
       await expect(page).toHaveURL('/sessions');
     });
 
     test('"About" link navigates to /about', async ({ page }) => {
       await page.goto('/');
-      await page.getByRole('link', { name: 'About' }).click();
+      await page.getByRole('banner').getByRole('link', { name: 'About' }).click();
       await page.waitForURL('/about');
       await expect(page).toHaveURL('/about');
     });
 
     test('"Home" link navigates back to / from /about', async ({ page }) => {
       await page.goto('/about');
-      await page.getByRole('link', { name: 'Home' }).click();
+      await page.getByRole('banner').getByRole('link', { name: 'Home' }).click();
       await page.waitForURL('/');
       await expect(page).toHaveURL('/');
     });
@@ -67,12 +67,12 @@ test.describe('Navbar', () => {
   test.describe('active route highlighting', () => {
     test('Home link has active-link class on /', async ({ page }) => {
       await page.goto('/');
-      await expect(page.getByRole('link', { name: 'Home' })).toHaveClass(/active-link/);
+      await expect(page.getByRole('banner').getByRole('link', { name: 'Home' })).toHaveClass(/active-link/);
     });
 
     test('Home link does not have active-link class on /about', async ({ page }) => {
       await page.goto('/about');
-      await expect(page.getByRole('link', { name: 'Home' })).not.toHaveClass(/active-link/);
+      await expect(page.getByRole('banner').getByRole('link', { name: 'Home' })).not.toHaveClass(/active-link/);
     });
 
     test('Plenary Sessions link has active-link class on /sessions', async ({ page }) => {
@@ -80,17 +80,17 @@ test.describe('Navbar', () => {
         route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ total: 0, sessions: [] }) })
       );
       await page.goto('/sessions');
-      await expect(page.getByRole('link', { name: 'Plenary Sessions' })).toHaveClass(/active-link/);
+      await expect(page.getByRole('banner').getByRole('link', { name: 'Plenary Sessions' })).toHaveClass(/active-link/);
     });
 
     test('About link has active-link class on /about', async ({ page }) => {
       await page.goto('/about');
-      await expect(page.getByRole('link', { name: 'About' })).toHaveClass(/active-link/);
+      await expect(page.getByRole('banner').getByRole('link', { name: 'About' })).toHaveClass(/active-link/);
     });
 
     test('About link does not have active-link class on /', async ({ page }) => {
       await page.goto('/');
-      await expect(page.getByRole('link', { name: 'About' })).not.toHaveClass(/active-link/);
+      await expect(page.getByRole('banner').getByRole('link', { name: 'About' })).not.toHaveClass(/active-link/);
     });
   });
 
@@ -120,12 +120,12 @@ test.describe('Navbar', () => {
 
     test('clicking NL translates "Plenary Sessions" nav link to "Plenaire vergaderingen"', async ({ page }) => {
       await page.getByRole('button', { name: 'NL' }).click();
-      await expect(page.getByRole('link', { name: 'Plenaire vergaderingen' })).toBeVisible();
+      await expect(page.getByRole('banner').getByRole('link', { name: 'Plenaire vergaderingen' })).toBeVisible();
     });
 
     test('clicking NL translates "About" nav link to "Over ons"', async ({ page }) => {
       await page.getByRole('button', { name: 'NL' }).click();
-      await expect(page.getByRole('link', { name: 'Over ons' })).toBeVisible();
+      await expect(page.getByRole('banner').getByRole('link', { name: 'Over ons' })).toBeVisible();
     });
 
     test('switching back to EN restores English hero title', async ({ page }) => {
@@ -138,7 +138,7 @@ test.describe('Navbar', () => {
 
     test('NL language persists when navigating to /about', async ({ page }) => {
       await page.getByRole('button', { name: 'NL' }).click();
-      await page.getByRole('link', { name: 'Over ons' }).click();
+      await page.getByRole('banner').getByRole('link', { name: 'Over ons' }).click();
       await page.waitForURL('/about');
       await expect(page.getByRole('heading', { level: 1, name: 'Over dit project' })).toBeVisible();
     });

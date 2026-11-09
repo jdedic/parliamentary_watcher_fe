@@ -66,12 +66,12 @@ test.describe('About page', () => {
 
   test.describe('navbar integration', () => {
     test('About nav link has active-link class on this page', async ({ page }) => {
-      await expect(page.getByRole('link', { name: 'About' })).toHaveClass(/active-link/);
+      await expect(page.getByRole('banner').getByRole('link', { name: 'About' })).toHaveClass(/active-link/);
     });
 
     test('page is reachable from Home via the About nav link', async ({ page }) => {
       await page.goto('/');
-      await page.getByRole('link', { name: 'About' }).click();
+      await page.getByRole('banner').getByRole('link', { name: 'About' }).click();
       await page.waitForURL('/about');
       await expect(page.getByRole('heading', { level: 1, name: 'About This Project' })).toBeVisible();
     });

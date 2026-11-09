@@ -49,9 +49,11 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
           </button>
           <div class="header-title-row">
             <h1>{{ session()!.title || '—' }}</h1>
+            <!-- Provisional chip: hidden for now, re-enable when needed.
             @if (!session()!.is_final) {
               <span class="provisional-chip">{{ 'sessions.provisional_chip' | translate }}</span>
             }
+            -->
           </div>
           <div class="meta-chips">
             @if (session()!.date) {
@@ -241,11 +243,13 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
     }
     .header-title-row { display: flex; align-items: center; gap: 16px; margin: 12px 0; flex-wrap: wrap; }
     h1 { font-size: 1.6rem; font-weight: 700; color: var(--ink); margin: 0; flex: 1; }
+    /* Provisional chip: hidden for now, re-enable together with the template block.
     .provisional-chip {
       font-size: 0.75rem; font-weight: 500; padding: 4px 12px;
       border-radius: var(--radius); border: 1px solid var(--line); color: var(--anchor);
       flex-shrink: 0;
     }
+    */
 
     .meta-chips { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; }
     .meta-item { display: flex; align-items: center; gap: 4px; font-size: 0.875rem; color: var(--text-muted); }
