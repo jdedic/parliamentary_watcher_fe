@@ -54,13 +54,6 @@
     "provisional_banner_body": "Deze vergadering is gebaseerd op een voorlopig verslag en kan worden bijgewerkt zodra het officiële verslag is gepubliceerd."
   },
   "chat": {
-    "gate_heading": "Toegang vereist",
-    "gate_description": "Voer de toegangscode in om over deze vergadering te chatten.",
-    "password_label": "Toegangscode",
-    "password_placeholder": "Voer uw toegangscode in…",
-    "submit_button": "Ontgrendelen",
-    "error_wrong_password": "Onjuiste toegangscode. Probeer het opnieuw.",
-    "gate_contact": "Wil je de chat testen? Neem contact op via",
     "input_placeholder": "Stel een vraag over deze vergadering…"
   },
   "speaker": {

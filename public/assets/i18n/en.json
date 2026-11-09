@@ -54,13 +54,6 @@
     "provisional_banner_body": "This session is based on a preliminary report and may be updated once the official record is published."
   },
   "chat": {
-    "gate_heading": "Access Required",
-    "gate_description": "Enter the access code to start chatting about this session.",
-    "password_label": "Access code",
-    "password_placeholder": "Enter your access code…",
-    "submit_button": "Unlock",
-    "error_wrong_password": "Incorrect access code. Please try again.",
-    "gate_contact": "Want to test the chat? Contact me at",
     "input_placeholder": "Ask a question about this session…"
   },
   "speaker": {

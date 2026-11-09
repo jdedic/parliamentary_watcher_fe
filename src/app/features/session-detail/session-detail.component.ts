@@ -19,7 +19,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTableModule } from '@angular/material/table';
 
 import { SessionService } from '../../core/services/session.service';
-import { ChatAuthService } from '../../core/services/chat-auth.service';
 import { PlenarySession, Stance, SummarySource } from '../../core/models/session.model';
 import { ChatMessage, ChunkDetail } from '../../core/models/chat.model';
 import { StanceChipComponent } from '../../shared/stance-chip/stance-chip.component';
@@ -143,75 +142,35 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
           <mat-tab [label]="'detail.tab_chat' | translate">
             <div class="tab-content">
 
-              @if (!chatAuthService.unlocked()) {
-                <!-- Password gate -->
-                <div class="chat-gate">
-                  <mat-card class="chat-gate-card">
-                    <mat-icon class="gate-icon">lock</mat-icon>
-                    <h2>{{ 'chat.gate_heading' | translate }}</h2>
-                    <p class="gate-contact">
-                      {{ 'chat.gate_contact' | translate }}
-                      <a href="mailto:jelena.dedic.it@gmail.com">jelena.dedic.it@gmail.com</a>
-                    </p>
-
-                    <mat-form-field appearance="outline" class="gate-field">
-                      <mat-label>{{ 'chat.password_label' | translate }}</mat-label>
-                      <input matInput
-                             type="password"
-                             [ngModel]="chatPassword()"
-                             (ngModelChange)="chatPassword.set($event); chatPasswordError.set(false)"
-                             (keydown.enter)="submitChatPassword()"
-                             [placeholder]="'chat.password_placeholder' | translate"
-                             [disabled]="chatPasswordLoading()">
-                    </mat-form-field>
-
-                    @if (chatPasswordError()) {
-                      <p class="gate-error">{{ 'chat.error_wrong_password' | translate }}</p>
-                    }
-
-                    <button class="gate-submit"
-                            (click)="submitChatPassword()"
-                            [disabled]="!chatPassword().trim() || chatPasswordLoading()">
-                      @if (chatPasswordLoading()) {
-                        <mat-spinner diameter="20"></mat-spinner>
-                      } @else {
-                        {{ 'chat.submit_button' | translate }}
-                      }
-                    </button>
-                  </mat-card>
-                </div>
-
-              } @else {
-                <!-- Chat interface -->
-                <div class="chat-container">
-                  <div class="chat-messages">
-                    @for (msg of chatHistory(); track $index) {
-                      <div [class]="'chat-bubble chat-' + msg.role">
-                        <div [innerHTML]="msg.content | markdown"></div>
-                      </div>
-                    }
-                    @if (chatLoading()) {
-                      <div class="chat-bubble chat-assistant chat-loading">
-                        <mat-spinner diameter="20"></mat-spinner>
-                      </div>
-                    }
-                  </div>
-                  @if (chatError()) {
-                    <p class="chat-error">{{ chatError() }}</p>
+              <!-- Chat interface -->
+              <div class="chat-container">
+                <div class="chat-messages">
+                  @for (msg of chatHistory(); track $index) {
+                    <div [class]="'chat-bubble chat-' + msg.role">
+                      <div [innerHTML]="msg.content | markdown"></div>
+                    </div>
                   }
-                  <div class="chat-input-row">
-                    <mat-form-field appearance="outline" class="chat-field" subscriptSizing="dynamic">
-                      <input matInput [(ngModel)]="chatInput"
-                             (keydown.enter)="sendMessage()"
-                             [placeholder]="'chat.input_placeholder' | translate"
-                             maxlength="200">
-                    </mat-form-field>
-                    <button class="chat-send-btn" (click)="sendMessage()" [disabled]="chatLoading()">
-                      <mat-icon>send</mat-icon>
-                    </button>
-                  </div>
+                  @if (chatLoading()) {
+                    <div class="chat-bubble chat-assistant chat-loading">
+                      <mat-spinner diameter="20"></mat-spinner>
+                    </div>
+                  }
                 </div>
-              }
+                @if (chatError()) {
+                  <p class="chat-error">{{ chatError() }}</p>
+                }
+                <div class="chat-input-row">
+                  <mat-form-field appearance="outline" class="chat-field" subscriptSizing="dynamic">
+                    <input matInput [(ngModel)]="chatInput"
+                           (keydown.enter)="sendMessage()"
+                           [placeholder]="'chat.input_placeholder' | translate"
+                           maxlength="200">
+                  </mat-form-field>
+                  <button class="chat-send-btn" (click)="sendMessage()" [disabled]="chatLoading()">
+                    <mat-icon>send</mat-icon>
+                  </button>
+                </div>
+              </div>
 
             </div>
           </mat-tab>
@@ -367,28 +326,6 @@ import { MarkdownPipe } from '../../shared/markdown.pipe';
     .chat-send-btn mat-icon { font-size: 24px; width: 24px; height: 24px; line-height: 24px; }
     .chat-error { color: var(--stance-oppose); font-size: 0.85rem; margin: 4px 0 8px; text-align: center; }
 
-    .chat-gate { display: flex; justify-content: center; padding: 48px 16px; }
-    .chat-gate-card {
-      max-width: 420px; width: 100%; padding: 40px 32px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center;
-      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-card);
-    }
-    .gate-icon { font-size: 48px; width: 48px; height: 48px; color: var(--anchor); }
-    .chat-gate-card h2 { font-size: 1.25rem; font-weight: 500; color: var(--ink); margin: 0; }
-    .gate-description { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
-    .gate-contact { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
-    .gate-contact a { color: var(--anchor); }
-    .gate-field { width: 100%; }
-    .gate-error { color: var(--stance-oppose); font-size: 0.85rem; margin: 0; }
-    .gate-submit {
-      display: inline-flex; align-items: center; justify-content: center;
-      background: var(--accent); color: var(--on-accent); border: 1px solid var(--accent);
-      font-family: var(--font-body); font-size: 1rem; font-weight: 500;
-      padding: 10px 24px; border-radius: var(--radius); cursor: pointer;
-      transition: opacity .15s;
-    }
-    .gate-submit:hover { opacity: .88; }
-    .gate-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
     .retrieval-table { width: 100%; }
     .retrieval-table th { font-weight: 500; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
     .retrieval-table td { font-size: 0.875rem; color: var(--ink); }
@@ -403,7 +340,6 @@ export class SessionDetailComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private destroyRef = inject(DestroyRef);
   private translateService = inject(TranslateService);
-  chatAuthService = inject(ChatAuthService);
 
   session = signal<PlenarySession | null>(null);
   loading = signal(true);
@@ -427,10 +363,6 @@ export class SessionDetailComponent implements OnInit {
   chatInput = '';
   chatLoading = signal(false);
   chatError = signal<string | null>(null);
-
-  chatPassword = signal('');
-  chatPasswordError = signal(false);
-  chatPasswordLoading = signal(false);
 
   lastChunks = signal<ChunkDetail[]>([]);
   readonly retrievalColumns = ['rank', 'chunk_id', 'rrf_score', 'rerank_score', 'chunk_index', 'type', 'speakers'];
@@ -458,25 +390,6 @@ export class SessionDetailComponent implements OnInit {
       .subscribe({
         next: s => { this.session.set(s); this.loading.set(false); },
         error: () => this.loading.set(false),
-      });
-  }
-
-  submitChatPassword(): void {
-    const pwd = this.chatPassword().trim();
-    if (!pwd || this.chatPasswordLoading()) return;
-    this.chatPasswordError.set(false);
-    this.chatPasswordLoading.set(true);
-    this.sessionService.verifyChat(pwd)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.chatAuthService.unlock(pwd);
-          this.chatPasswordLoading.set(false);
-        },
-        error: () => {
-          this.chatPasswordError.set(true);
-          this.chatPasswordLoading.set(false);
-        },
       });
   }
 
