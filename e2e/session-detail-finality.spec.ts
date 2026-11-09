@@ -52,13 +52,13 @@ function mockDetail(page: import('@playwright/test').Page, id: string, body: unk
 // ---------------------------------------------------------------------------
 
 test.describe('Session detail page — provisional vs final', () => {
-  test('shows a "Provisional" chip next to the title when is_final is false', async ({ page }) => {
+  test('does not show a "Provisional" chip next to the title when is_final is false', async ({ page }) => {
     await mockDetail(page, 'session-202', MOCK_PROVISIONAL_DETAIL);
     await page.goto('/sessions/session-202');
 
     const titleRow = page.locator('.header-title-row');
     await expect(titleRow.getByRole('heading', { level: 1, name: 'Debate on Housing Subsidies' })).toBeVisible();
-    await expect(titleRow.getByText('Provisional', { exact: true })).toBeVisible();
+    await expect(titleRow.getByText('Provisional', { exact: true })).toHaveCount(0);
   });
 
   test('shows the provisional info banner when is_final is false', async ({ page }) => {

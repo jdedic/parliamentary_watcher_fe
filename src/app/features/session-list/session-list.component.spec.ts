@@ -197,16 +197,11 @@ describe('SessionListComponent', () => {
   });
 
   // ---------------------------------------------------------------------
-  // .provisional-chip on session cards
+  // No provisional chip on session cards (removed for now)
   // ---------------------------------------------------------------------
 
   describe('provisional chip on session cards', () => {
-    it('does not render .provisional-chip for a final session', () => {
-      // default mockSession (is_final: true) is loaded in the top-level beforeEach
-      expect(fixture.nativeElement.querySelector('.provisional-chip')).toBeNull();
-    });
-
-    it('renders .provisional-chip for a session with is_final: false', async () => {
+    it('does not render .provisional-chip even for a session with is_final: false', async () => {
       vi.clearAllMocks();
       mockSessionService.getSessions.mockReturnValue(of({ sessions: [mockProvisionalSession], total: 1 }));
 
@@ -216,9 +211,8 @@ describe('SessionListComponent', () => {
       await fixture.whenStable();
       fixture.detectChanges();
 
-      const chip = fixture.nativeElement.querySelector('.provisional-chip');
-      expect(chip).not.toBeNull();
-      expect(chip?.textContent?.trim()).toBe('sessions.provisional_chip');
+      expect(fixture.nativeElement.querySelector('.session-card')).not.toBeNull();
+      expect(fixture.nativeElement.querySelector('.provisional-chip')).toBeNull();
     });
   });
 

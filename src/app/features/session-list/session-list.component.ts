@@ -71,9 +71,11 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
                 @if (session.status) {
                   <app-status-badge [status]="session.status"></app-status-badge>
                 }
+                <!-- Provisional chip: hidden for now, re-enable when needed.
                 @if (!session.is_final) {
                   <span class="provisional-chip">{{ 'sessions.provisional_chip' | translate }}</span>
                 }
+                -->
               </div>
               <h2 class="card-title">{{ session.title || '—' }}</h2>
               <div class="card-details">
@@ -123,10 +125,12 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
     }
     .finality-filter button:hover { color: var(--ink); }
     .finality-filter button.filter-active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-card); }
+    /* Provisional chip: hidden for now, re-enable together with the template block.
     .provisional-chip {
       font-size: 0.75rem; font-weight: 500; padding: 4px 12px;
       border-radius: var(--radius); border: 1px solid var(--line); color: var(--anchor);
     }
+    */
     .spinner-wrap { display: flex; justify-content: center; padding: 60px; }
     .empty-msg { color: var(--text-muted); font-size: 1rem; text-align: center; padding: 60px 0; }
     .card-grid {

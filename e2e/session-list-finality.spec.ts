@@ -127,7 +127,7 @@ test.describe('Session List page — finality filter buttons', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Provisional chip on session cards
+// No provisional chip on session cards (removed for now)
 // ---------------------------------------------------------------------------
 
 test.describe('Session List page — provisional chip', () => {
@@ -136,9 +136,10 @@ test.describe('Session List page — provisional chip', () => {
     await page.goto('/sessions');
   });
 
-  test('shows a "Provisional" chip on a session card with is_final: false', async ({ page }) => {
+  test('does not show a "Provisional" chip on a session card with is_final: false', async ({ page }) => {
     const provisionalCard = page.locator('.session-card', { hasText: 'Debate on Housing Subsidies' });
-    await expect(provisionalCard.getByText('Provisional', { exact: true })).toBeVisible();
+    await expect(provisionalCard).toBeVisible();
+    await expect(provisionalCard.getByText('Provisional', { exact: true })).toHaveCount(0);
   });
 
   test('does not show a "Provisional" chip on a session card with is_final: true', async ({ page }) => {

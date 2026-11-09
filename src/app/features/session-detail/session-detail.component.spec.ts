@@ -206,7 +206,7 @@ describe('SessionDetailComponent', () => {
         imports: [SessionDetailComponent, FormsModule],
         providers: [
           { provide: SessionService, useValue: mockSessionService },
-            provideAnimationsAsync('noop'),
+          provideAnimationsAsync('noop'),
           provideRouter([]),
           {
             provide: ActivatedRoute,
@@ -249,7 +249,7 @@ describe('SessionDetailComponent', () => {
     // A session with is_final: false requires its own session payload, so this
     // test rebuilds the TestBed with an override session rather than reusing
     // the shared fixture from the top-level beforeEach.
-    it('renders .provisional-chip and .provisional-banner when is_final is false', async () => {
+    it('renders .provisional-banner (but no .provisional-chip) when is_final is false', async () => {
       const provisionalSession: PlenarySession = { ...mockSession, is_final: false };
 
       TestBed.resetTestingModule();
@@ -259,7 +259,7 @@ describe('SessionDetailComponent', () => {
         imports: [SessionDetailComponent, FormsModule],
         providers: [
           { provide: SessionService, useValue: mockSessionService },
-            provideAnimationsAsync('noop'),
+          provideAnimationsAsync('noop'),
           provideRouter([]),
           {
             provide: ActivatedRoute,
@@ -280,8 +280,7 @@ describe('SessionDetailComponent', () => {
       const chip = nativeEl.querySelector('.provisional-chip');
       const banner = nativeEl.querySelector('.provisional-banner');
 
-      expect(chip).not.toBeNull();
-      expect(chip?.textContent?.trim()).toBe('sessions.provisional_chip');
+      expect(chip).toBeNull();
 
       expect(banner).not.toBeNull();
       expect(banner?.querySelector('strong')?.textContent?.trim()).toBe('detail.provisional_banner_title');
