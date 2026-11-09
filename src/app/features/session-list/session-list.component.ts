@@ -40,6 +40,8 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
                [placeholder]="'sessions.search_placeholder' | translate">
       </mat-form-field>
 
+      <!-- Finality filter: hidden for now; the list shows final sessions only
+           (finalityFilter defaults to 'final'). Re-enable when needed.
       <div class="finality-filter">
         <button [class.filter-active]="finalityFilter() === 'all'" (click)="setFinalityFilter('all')">
           {{ 'sessions.filter_all' | translate }}
@@ -51,6 +53,7 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
           {{ 'sessions.filter_provisional' | translate }}
         </button>
       </div>
+      -->
 
       @if (loading()) {
         <div class="spinner-wrap"><mat-spinner diameter="48"></mat-spinner></div>
@@ -113,6 +116,7 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
     .list-container { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
     h1 { font-size: 1.75rem; font-weight: 700; color: var(--ink); margin-bottom: 24px; }
     .search-field { width: 100%; max-width: 480px; margin-bottom: 16px; }
+    /* Finality filter: hidden for now, re-enable together with the template block.
     .finality-filter {
       display: inline-flex; gap: 4px; padding: 4px;
       background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
@@ -125,6 +129,7 @@ import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.com
     }
     .finality-filter button:hover { color: var(--ink); }
     .finality-filter button.filter-active { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-card); }
+    */
     /* Provisional chip: hidden for now, re-enable together with the template block.
     .provisional-chip {
       font-size: 0.75rem; font-weight: 500; padding: 4px 12px;
@@ -188,7 +193,8 @@ export class SessionListComponent implements OnInit {
   total = signal(0);
   loading = signal(false);
   currentLang = signal(this.translateService.currentLang ?? 'en');
-  finalityFilter = signal<'all' | 'final' | 'provisional'>('all');
+  // Defaults to 'final': the list shows only final (official-record) sessions.
+  finalityFilter = signal<'all' | 'final' | 'provisional'>('final');
   searchTerm = '';
   pageSize = 20;
   currentSkip = 0;

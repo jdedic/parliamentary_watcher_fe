@@ -58,71 +58,29 @@ function mockSessionList(page: import('@playwright/test').Page, body = MOCK_SESS
 }
 
 // ---------------------------------------------------------------------------
-// Filter buttons: All / Final / Provisional
+// Final sessions only — the finality filter is hidden for now
 // ---------------------------------------------------------------------------
 
-test.describe('Session List page — finality filter buttons', () => {
-  test.beforeEach(async ({ page }) => {
+test.describe('Session List page — final sessions only', () => {
+  test('does not render the All / Final / Provisional filter', async ({ page }) => {
     await mockSessionList(page);
     await page.goto('/sessions');
-    // Wait for the initial (unfiltered) load to render, so a later
-    // waitForRequest can't capture this request instead of the click's.
     await expect(page.locator('.session-card').first()).toBeVisible();
+
+    await expect(page.locator('.finality-filter')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Provisional' })).toHaveCount(0);
   });
 
-  test('"All" filter button is active by default', async ({ page }) => {
-    await expect(page.getByRole('button', { name: 'All' })).toHaveClass(/filter-active/);
-  });
-
-  test('initial request (default "All" filter) omits the is_final query param', async ({ page }) => {
-    await page.unrouteAll();
+  test('requests only final sessions (is_final=true) on load', async ({ page }) => {
     await mockSessionList(page);
     const [request] = await Promise.all([
       page.waitForRequest(req => req.url().includes('/api/v1/sessions')),
       page.goto('/sessions'),
     ]);
-    expect(request.url()).not.toContain('is_final');
-  });
 
-  test('clicking "Final" marks it active and requests is_final=true', async ({ page }) => {
-    const [request] = await Promise.all([
-      page.waitForRequest(req =>
-        req.url().includes('/api/v1/sessions') && new URL(req.url()).searchParams.has('is_final'),
-      ),
-      page.getByRole('button', { name: 'Final' }).click(),
-    ]);
-
-    expect(request.url()).toContain('is_final=true');
-    await expect(page.getByRole('button', { name: 'Final' })).toHaveClass(/filter-active/);
-    await expect(page.getByRole('button', { name: 'All' })).not.toHaveClass(/filter-active/);
-  });
-
-  test('clicking "Provisional" marks it active and requests is_final=false', async ({ page }) => {
-    const [request] = await Promise.all([
-      page.waitForRequest(req =>
-        req.url().includes('/api/v1/sessions') && new URL(req.url()).searchParams.has('is_final'),
-      ),
-      page.getByRole('button', { name: 'Provisional' }).click(),
-    ]);
-
-    expect(request.url()).toContain('is_final=false');
-    await expect(page.getByRole('button', { name: 'Provisional' })).toHaveClass(/filter-active/);
-    await expect(page.getByRole('button', { name: 'All' })).not.toHaveClass(/filter-active/);
-  });
-
-  test('clicking "All" after another filter omits is_final again', async ({ page }) => {
-    await Promise.all([
-      page.waitForResponse(res => new URL(res.url()).searchParams.get('is_final') === 'true'),
-      page.getByRole('button', { name: 'Final' }).click(),
-    ]);
-
-    const [request] = await Promise.all([
-      page.waitForRequest(req => req.url().includes('/api/v1/sessions')),
-      page.getByRole('button', { name: 'All' }).click(),
-    ]);
-
-    expect(request.url()).not.toContain('is_final');
-    await expect(page.getByRole('button', { name: 'All' })).toHaveClass(/filter-active/);
+    const params = new URL(request.url()).searchParams;
+    expect(params.get('is_final')).toBe('true');
+    expect(params.get('status')).toBe('SUMMARISED');
   });
 });
 
@@ -149,23 +107,11 @@ test.describe('Session List page — provisional chip', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Empty state when the Provisional filter returns zero results
+// Empty state
 // ---------------------------------------------------------------------------
 
-test.describe('Session List page — provisional empty state', () => {
-  test('shows "No provisional sessions right now." when the Provisional filter returns zero results', async ({ page }) => {
-    await mockSessionList(page);
-    await page.goto('/sessions');
-
-    await page.unrouteAll();
-    await mockSessionList(page, MOCK_EMPTY);
-    await page.getByRole('button', { name: 'Provisional' }).click();
-
-    await expect(page.getByText('No provisional sessions right now.')).toBeVisible();
-    await expect(page.getByText('No sessions found.')).not.toBeVisible();
-  });
-
-  test('shows the generic "No sessions found." message when the "All" filter returns zero results', async ({ page }) => {
+test.describe('Session List page — empty state', () => {
+  test('shows the generic "No sessions found." message when there are no final sessions', async ({ page }) => {
     await mockSessionList(page, MOCK_EMPTY);
     await page.goto('/sessions');
 
