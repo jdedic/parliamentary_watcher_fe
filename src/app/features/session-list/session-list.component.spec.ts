@@ -93,15 +93,16 @@ describe('SessionListComponent', () => {
   // ---------------------------------------------------------------------
 
   describe('finalityFilter', () => {
-    it('defaults to "all"', () => {
-      expect(component.finalityFilter()).toBe('all');
+    it('defaults to "final"', () => {
+      expect(component.finalityFilter()).toBe('final');
     });
 
-    it('calls getSessions with isFinal=undefined on initial load (default "all" filter)', () => {
-      expect(mockSessionService.getSessions).toHaveBeenCalledWith(0, 20, undefined, undefined);
+    it('calls getSessions with isFinal=true on initial load (final sessions only)', () => {
+      expect(mockSessionService.getSessions).toHaveBeenCalledWith(0, 20, undefined, true);
     });
 
-    it('setFinalityFilter("final") sets the signal and reloads with isFinal=true', () => {
+    it('setFinalityFilter("final") reloads with isFinal=true after switching away from "final"', () => {
+      component.setFinalityFilter('all');
       vi.clearAllMocks();
       mockSessionService.getSessions.mockReturnValue(of({ sessions: [mockSession], total: 1 }));
 
@@ -121,8 +122,7 @@ describe('SessionListComponent', () => {
       expect(mockSessionService.getSessions).toHaveBeenCalledWith(0, 20, undefined, false);
     });
 
-    it('setFinalityFilter("all") reloads with isFinal=undefined after switching away from "all"', () => {
-      component.setFinalityFilter('final');
+    it('setFinalityFilter("all") reloads with isFinal=undefined', () => {
       vi.clearAllMocks();
       mockSessionService.getSessions.mockReturnValue(of({ sessions: [mockSession], total: 1 }));
 
@@ -140,59 +140,30 @@ describe('SessionListComponent', () => {
       vi.clearAllMocks();
       mockSessionService.getSessions.mockReturnValue(of({ sessions: [mockSession], total: 1 }));
 
-      component.setFinalityFilter('final');
+      component.setFinalityFilter('all');
 
       expect(component.currentSkip).toBe(0);
       expect(component.currentPageIndex).toBe(0);
-      expect(mockSessionService.getSessions).toHaveBeenCalledWith(0, 20, undefined, true);
+      expect(mockSessionService.getSessions).toHaveBeenCalledWith(0, 20, undefined, undefined);
     });
 
     it('is a no-op (does not reload) when called with the already-active filter', () => {
-      // finalityFilter is already 'all' by default
+      // finalityFilter is already 'final' by default
       vi.clearAllMocks();
 
-      component.setFinalityFilter('all');
+      component.setFinalityFilter('final');
 
       expect(mockSessionService.getSessions).not.toHaveBeenCalled();
     });
   });
 
   // ---------------------------------------------------------------------
-  // Filter buttons — template
+  // Filter buttons — hidden for now
   // ---------------------------------------------------------------------
 
   describe('finality filter buttons (template)', () => {
-    it('marks the "All" button as filter-active by default and the others as not', () => {
-      const buttons: NodeListOf<HTMLButtonElement> =
-        fixture.nativeElement.querySelectorAll('.finality-filter button');
-
-      expect(buttons.length).toBe(3);
-      expect(buttons[0].classList.contains('filter-active')).toBe(true);
-      expect(buttons[1].classList.contains('filter-active')).toBe(false);
-      expect(buttons[2].classList.contains('filter-active')).toBe(false);
-    });
-
-    it('marks the "Final" button as filter-active after it is clicked', () => {
-      const buttons: NodeListOf<HTMLButtonElement> =
-        fixture.nativeElement.querySelectorAll('.finality-filter button');
-
-      buttons[1].click();
-      fixture.detectChanges();
-
-      expect(buttons[1].classList.contains('filter-active')).toBe(true);
-      expect(buttons[0].classList.contains('filter-active')).toBe(false);
-      expect(buttons[2].classList.contains('filter-active')).toBe(false);
-    });
-
-    it('calls setFinalityFilter("provisional") when the "Provisional" button is clicked', () => {
-      const spy = vi.spyOn(component, 'setFinalityFilter');
-      const buttons: NodeListOf<HTMLButtonElement> =
-        fixture.nativeElement.querySelectorAll('.finality-filter button');
-
-      buttons[2].click();
-      fixture.detectChanges();
-
-      expect(spy).toHaveBeenCalledWith('provisional');
+    it('does not render the finality filter', () => {
+      expect(fixture.nativeElement.querySelector('.finality-filter')).toBeNull();
     });
   });
 
@@ -221,7 +192,7 @@ describe('SessionListComponent', () => {
   // ---------------------------------------------------------------------
 
   describe('empty state message', () => {
-    it('shows sessions.no_results when the result set is empty and filter is "all"', async () => {
+    it('shows sessions.no_results when the result set is empty (default "final" filter)', async () => {
       vi.clearAllMocks();
       mockSessionService.getSessions.mockReturnValue(of({ sessions: [], total: 0 }));
 
@@ -247,6 +218,7 @@ describe('SessionListComponent', () => {
     });
 
     it('still shows sessions.no_results (not the provisional variant) when empty and filter is "final"', () => {
+      component.setFinalityFilter('all'); // switch away so switching back to 'final' triggers a reload
       vi.clearAllMocks();
       mockSessionService.getSessions.mockReturnValue(of({ sessions: [], total: 0 }));
 
