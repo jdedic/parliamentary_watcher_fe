@@ -38,6 +38,6 @@ test.describe('Home page', () => {
   });
 
   test('navbar brand link is present', async ({ page }) => {
-    await expect(page.getByText('Demos')).toBeVisible();
+    await expect(page.getByRole('banner').getByRole('link', { name: 'Demos' })).toBeVisible();
   });
 });
